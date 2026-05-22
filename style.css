@@ -63,7 +63,52 @@ body::before {
     color: white;
 }
 
+.sidebar-dropdown {
+    width: 100%;
+}
 
+.dropdown-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.dropdown-menu {
+    margin-top: 6px;
+    margin-left: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    animation: fadeDown .2s ease;
+}
+
+.dropdown-menu a {
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: #0f172a;
+    font-size: 14px;
+}
+
+.dropdown-menu a:hover {
+    background: #1e293b;
+}
+
+.hidden {
+    display: none !important;
+}
+
+@keyframes fadeDown {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
 .app {
     display: grid;
     grid-template-columns: 260px 1fr;

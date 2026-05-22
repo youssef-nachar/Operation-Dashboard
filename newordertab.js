@@ -947,7 +947,9 @@ function resolveOrderStatus(order) {
     if (order.status === "canceled") {
         return "canceled";
     }
-
+if (returnedOrders.has(order.orderNo)) {
+    return "returned";
+}
     if (order.status === "canceled_before_delivery") {
         return "canceled_before_delivery";
     }

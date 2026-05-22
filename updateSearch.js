@@ -25,11 +25,12 @@ const filtered = allOrders.filter(o => {
 
     tableDiv.innerHTML = `  
     <table>  
-        <tr>  
-            <th>Order #</th>  
-            <th>Warehouses</th>  
-            <th>Status</th>  
-        </tr>  
+<tr>
+    <th>Order #</th>
+    <th>Warehouses</th>
+    <th>Status</th>
+    <th>Comment</th>
+</tr>
         ${filtered.map(order => {
 
         /* ---------------- STATUS ---------------- */
@@ -155,6 +156,14 @@ const filtered = allOrders.filter(o => {
                     <td>${warehousesHTML}</td>  
   
                     <td>${statusText}</td>  
+                    <td style="
+    color:#38bdf8;
+    font-size:12px;
+    max-width:200px;
+    word-break:break-word;
+">
+    ${order.comment ? order.comment : "-"}
+</td>
                 </tr>  
             `;
     }).join("")}  

@@ -12,24 +12,6 @@ let selectedDateFilter = null;
 let showOnlyDistributed = false;
 let returnedOrders = new Set();
 let returnedOrdersMap = {};
-const users = [
-
-    { username: "manager", password: "123456", warehouse: "P&C", role: "manager" },
-
-    { username: "pharmaUser", password: "123456", warehouse: "PHARMA", role: "user" },
-
-    { username: "retailUser", password: "123456", warehouse: "RETAIL", role: "user" },
-
-    { username: "pcUser", password: "123456", warehouse: "P&C", role: "user" },
-
-    { username: "lorealLuxUser", password: "123456", warehouse: "LOREAL LUX", role: "user" },
-
-    { username: "beeslineUser", password: "123456", warehouse: "BEESLINE", role: "user" },
-
-    // 🔵 Packing Station User
-    { username: "packingUser", password: "123456", warehouse: "Packing Station", role: "packing" }
-
-];
 let localOrders = [];
 function hashData(data) {
     return JSON.stringify(
@@ -1447,52 +1429,4 @@ function toggleWarehouseMenu(event) {
         document.getElementById("warehouseMenu");
 
     menu.classList.toggle("hidden");
-}
-function showDashboardHome() {
-
-    document.getElementById("dashboardHeader").style.display = "flex";
-
-    document.getElementById("newOrderTab")
-        .classList.add("hidden");
-
-    document.getElementById("teamNotesTab")
-        .classList.add("hidden");
-
-    document.getElementById("readyTab")
-        .classList.add("hidden");
-
-    // 🔥 أضف هذا
-    document.getElementById("returnTab")
-        .classList.add("hidden");
-
-    document.getElementById("dsh").style.display = "block";
-
-    document.querySelector(".kpis")
-        .classList.remove("hidden");
-
-    document.querySelector(".warehouse-container")
-        .classList.remove("hidden");
-
-    document.querySelector(".sales-order")
-        .classList.remove("hidden");
-}
-function loginAsWarehouse(warehouseName) {
-
-    const user = users.find(
-        u => u.warehouse === warehouseName
-    );
-
-    if (!user) {
-        alert("Warehouse user not found");
-        return;
-    }
-
-    // حفظ بيانات الدخول
-    localStorage.setItem("isLoggedIn", "true");
-    localStorage.setItem("currentWarehouse", user.warehouse);
-    localStorage.setItem("userWarehouse", user.warehouse);
-    localStorage.setItem("userRole", user.role);
-
-    // إعادة تحميل الصفحة
-    location.reload();
 }

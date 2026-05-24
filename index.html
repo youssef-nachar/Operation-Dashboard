@@ -122,6 +122,10 @@
             <a href="#" onclick="showReportsTab()">
     Reports
 </a>
+<a href="#" onclick="showAboutTab()">
+    <i class="fa-solid fa-circle-info"></i>
+    About System
+</a>
                 <a href="#" onclick="signOut()" style="color:#ef4444">Logout</a>
         </aside>
 
@@ -217,6 +221,92 @@ background:#22c55e;
 </div>
 <div id="reportsTab" class="hidden">
 
+    <!-- BUTTON -->
+    <button id="toggleAdvancedReportsBtn"
+        onclick="toggleAdvancedReports()"
+        style="
+            padding:12px 18px;
+            background:#0f172a;
+            color:white;
+            border:none;
+            border-radius:10px;
+            cursor:pointer;
+            font-weight:600;
+            margin-bottom:15px;
+    ">
+        📊 Analytics
+    </button>
+
+    <!-- ADVANCED REPORT BOX -->
+    <div id="advancedReportBox"
+        class="hidden"
+        style="
+            background:#0f172a;
+            padding:20px;
+            border-radius:14px;
+            margin-top:20px;
+    ">
+
+     <h2 style="
+    margin-bottom:20px;
+    color:#22c55e;
+">
+    Operations Analytics
+</h2>
+        <div style="
+            display:flex;
+            gap:10px;
+            flex-wrap:wrap;
+            align-items:center;
+        ">
+
+            <input
+                type="date"
+                id="advancedFromDate"
+                style="
+                    padding:10px;
+                    border:none;
+                    border-radius:8px;
+                    background:#1e293b;
+                    color:white;
+            ">
+
+            <input
+                type="date"
+                id="advancedToDate"
+                style="
+                    padding:10px;
+                    border:none;
+                    border-radius:8px;
+                    background:#1e293b;
+                    color:white;
+            ">
+
+            <button
+                onclick="exportAdvancedExcel()"
+                style="
+                    padding:10px 20px;
+                    border:none;
+                    border-radius:8px;
+                    background:#22c55e;
+                    color:white;
+                    font-weight:700;
+                    cursor:pointer;
+            ">
+                Export Excel Report
+            </button>
+
+        </div>
+
+        <div id="reportStats"
+            style="
+                margin-top:20px;
+                display:grid;
+                grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+                gap:15px;
+        "></div>
+
+    </div>
     <h2 style="margin-bottom:20px">Reports</h2>
 
     <div style="display:flex;gap:10px;flex-wrap:wrap">
@@ -234,6 +324,305 @@ background:#22c55e;
         </button>
 
     </div>
+
+</div>
+<!-- ABOUT TAB -->
+<!-- PROFESSIONAL ABOUT TAB -->
+<div id="aboutTab" class="hidden">
+
+<div class="about-wrapper">
+
+    <!-- HERO SECTION -->
+    <div class="about-hero">
+
+        <div class="about-overlay"></div>
+
+        <div class="about-hero-content">
+
+            <div class="about-badge">
+                ENTERPRISE WAREHOUSE PLATFORM
+            </div>
+
+            <h1>
+                Warehouse Operations Dashboard
+            </h1>
+
+            <p>
+                Real-time warehouse management platform designed to optimize
+                operations, distribution tracking, reporting, and enterprise logistics.
+            </p>
+
+            <div class="about-dev">
+                <div class="dev-avatar">
+                    YN
+                </div>
+
+                <div>
+                    <h3>Developed by Youssef Nachar</h3>
+                 
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- SYSTEM STATS -->
+    <div class="about-stats">
+
+        <div class="about-stat-card">
+            <i class="fa-solid fa-database"></i>
+            <h2>Firebase</h2>
+            <span>Realtime Database</span>
+        </div>
+
+        <div class="about-stat-card">
+            <i class="fa-solid fa-warehouse"></i>
+            <h2>Multi Warehouse</h2>
+            <span>Operations Control</span>
+        </div>
+
+        <div class="about-stat-card">
+            <i class="fa-solid fa-chart-line"></i>
+            <h2>Analytics</h2>
+            <span>Live Reporting Engine</span>
+        </div>
+
+        <div class="about-stat-card">
+            <i class="fa-solid fa-bolt"></i>
+            <h2>Realtime</h2>
+            <span>Instant Synchronization</span>
+        </div>
+
+    </div>
+
+    <!-- GRID -->
+    <div class="about-grid">
+
+        <!-- LEFT -->
+        <div class="about-card">
+
+            <h2>
+                <i class="fa-solid fa-layer-group"></i>
+                System Overview
+            </h2>
+
+            <p>
+                This enterprise dashboard was built to centralize warehouse operations,
+                monitor distribution workflows, manage returns,
+                and provide real-time visibility across all operational departments.
+            </p>
+
+            <p>
+                The platform delivers live synchronization using Firebase Realtime Database,
+                ensuring instant updates without manual refresh.
+            </p>
+
+        </div>
+
+        <!-- RIGHT -->
+        <div class="about-card">
+
+            <h2>
+                <i class="fa-solid fa-microchip"></i>
+                Core Technologies
+            </h2>
+
+            <div class="tech-stack">
+
+                <span>HTML5</span>
+                <span>CSS3</span>
+                <span>JavaScript</span>
+                <span>Firebase</span>
+                <span>Realtime DB</span>
+                <span>XLSX Export</span>
+                <span>Font Awesome</span>
+                <span>Analytics Engine</span>
+
+            </div>
+
+        </div>
+
+        <!-- FEATURES -->
+        <div class="about-card wide">
+
+            <h2>
+                <i class="fa-solid fa-shield-halved"></i>
+                Enterprise Features
+            </h2>
+
+            <div class="features-grid">
+
+                <div class="feature-box">
+                    <i class="fa-solid fa-box"></i>
+                    <span>Order Tracking</span>
+                </div>
+
+                <div class="feature-box">
+                    <i class="fa-solid fa-truck"></i>
+                    <span>Distribution Control</span>
+                </div>
+
+                <div class="feature-box">
+                    <i class="fa-solid fa-rotate-left"></i>
+                    <span>Returns Management</span>
+                </div>
+
+                <div class="feature-box">
+                    <i class="fa-solid fa-file-excel"></i>
+                    <span>Excel Exporting</span>
+                </div>
+
+                <div class="feature-box">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>Advanced Reports</span>
+                </div>
+
+                <div class="feature-box">
+                    <i class="fa-solid fa-users"></i>
+                    <span>Team Collaboration</span>
+                </div>
+
+                <div class="feature-box">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                    <span>History Tracking</span>
+                </div>
+
+                <div class="feature-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <span>Smart Search</span>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ARCHITECTURE -->
+        <div class="about-card wide">
+
+            <h2>
+                <i class="fa-solid fa-diagram-project"></i>
+                System Architecture
+            </h2>
+
+            <div class="architecture-flow">
+
+                <div class="arch-box">
+                    Users
+                </div>
+
+                <div class="arch-line"></div>
+
+                <div class="arch-box">
+                    Dashboard UI
+                </div>
+
+                <div class="arch-line"></div>
+
+                <div class="arch-box">
+                    Firebase Realtime DB
+                </div>
+
+                <div class="arch-line"></div>
+
+                <div class="arch-box">
+                    Live Operations
+                </div>
+<!-- ORDER FLOW -->
+<div class="about-card wide">
+
+    <h2>
+        <i class="fa-solid fa-route"></i>
+        Order Lifecycle Flow
+    </h2>
+
+    <div class="order-flow">
+
+        <!-- STEP -->
+        <div class="flow-step pending">
+
+            <div class="flow-icon">
+                <i class="fa-solid fa-box"></i>
+            </div>
+
+            <h3>Pending</h3>
+
+            <p>
+                Order received in warehouse
+            </p>
+
+        </div>
+
+        <!-- ARROW -->
+        <div class="flow-arrow">
+            <i class="fa-solid fa-arrow-right"></i>
+        </div>
+
+        <!-- STEP -->
+        <div class="flow-step packing">
+
+            <div class="flow-icon">
+                <i class="fa-solid fa-box-open"></i>
+            </div>
+
+            <h3>In-Packing</h3>
+
+            <p>
+                Packing Station processing
+            </p>
+
+        </div>
+
+        <!-- ARROW -->
+        <div class="flow-arrow">
+            <i class="fa-solid fa-arrow-right"></i>
+        </div>
+
+        <!-- STEP -->
+        <div class="flow-step ready">
+
+            <div class="flow-icon">
+                <i class="fa-solid fa-truck-ramp-box"></i>
+            </div>
+
+            <h3>Ready To Distribute</h3>
+
+            <p>
+                Shipment prepared for dispatch
+            </p>
+
+        </div>
+
+        <!-- ARROW -->
+        <div class="flow-arrow">
+            <i class="fa-solid fa-arrow-right"></i>
+        </div>
+
+        <!-- STEP -->
+        <div class="flow-step distributed">
+
+            <div class="flow-icon">
+                <i class="fa-solid fa-truck"></i>
+            </div>
+
+            <h3>Distributed</h3>
+
+            <p>
+                Order delivered successfully
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
 
 </div>
             <div id="teamNotesTab" class="hidden">
@@ -262,7 +651,10 @@ background:#22c55e;
                 <div id="teamNotesList"></div>
 
             </div>
-        <div id="readyTab" class="hidden"></div>
+        <div id="readyTab" class="hidden">
+        
+        </div>
+        <div id="settingsTab" class="hidden"></div>
             <div id="newOrderTab" class="card hidden" style="margin-top:30px">
 
                 <h3 style="

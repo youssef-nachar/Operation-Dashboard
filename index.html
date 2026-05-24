@@ -119,6 +119,9 @@
             <a href="#" id="teamNotesBtn" style="display:none;" onclick="openTeamNotesTab()">
                 Team Notes
             </a>
+            <a href="#" onclick="showReportsTab()">
+    Reports
+</a>
                 <a href="#" onclick="signOut()" style="color:#ef4444">Logout</a>
         </aside>
 
@@ -212,6 +215,27 @@ background:#22c55e;
     </div>
 
 </div>
+<div id="reportsTab" class="hidden">
+
+    <h2 style="margin-bottom:20px">Reports</h2>
+
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+
+        <button onclick="exportDailyReport()">
+            Daily Report
+        </button>
+
+        <button onclick="exportWeeklyReport()">
+            Weekly Report
+        </button>
+
+        <button onclick="exportMonthlyReport()">
+            Monthly Report
+        </button>
+
+    </div>
+
+</div>
             <div id="teamNotesTab" class="hidden">
 
                 <h2 style="margin-bottom:15px"> Team Notes</h2>
@@ -288,17 +312,17 @@ background:#22c55e;
 
 </div>
                     <div class="input-group">
-                        <i id="hashtag" class="fa-solid fa-hashtag"></i>
+                        <i id="y"id="hashtag" class="fa-solid fa-hashtag"></i>
                         <input type="text" id="newOrderNumber" placeholder="Order Number">
                     </div>
 
                     <div class="input-group">
-                        <i class="fa-solid fa-warehouse"></i>
+                        <i id="h"class="fa-solid fa-warehouse"></i>
                         <input type="text" id="newWarehouseName" placeholder="Warehouse Name">
                     </div>
 
                     <div class="input-group">
-                        <i class="fa-solid fa-calendar"></i>
+                        <i id="n" class="fa-solid fa-calendar"></i>
                         <input type="date" id="newOrderDate">
                     </div>
 
@@ -350,7 +374,18 @@ margin-bottom:10px;
 ">
                             Show Received Only
                         </button>
-
+<div id="warehouseFilter" style="display:none; margin-bottom:10px;">
+    <select id="warehouseDropdown"
+        style="
+            background:#0f172a;
+            color:white;
+            padding:8px 10px;
+            border:1px solid #1f2937;
+            border-radius:8px;
+        ">
+        <option value="">All Warehouses</option>
+    </select>
+</div>
                         <input type="text" id="newOrderSearch" placeholder="Search by Order #..." style="
             width:100%;
             padding:10px 14px 10px 40px;
@@ -434,7 +469,20 @@ Export Excel
     <div id="returned" class="value">0</div>
 </div>
             </div>
-
+<div id="exportLoading"
+     style="
+        display:none;
+        position:fixed;
+        inset:0;
+        background:rgba(0,0,0,.6);
+        z-index:9999;
+        align-items:center;
+        justify-content:center;
+        color:white;
+        font-size:20px;
+">
+    Exporting Excel...
+</div>
             <div class="warehouse-container">
 
 

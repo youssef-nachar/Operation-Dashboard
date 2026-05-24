@@ -235,7 +235,16 @@ function getBaseFilteredOrders() {
     const DEFAULT_START = "2026-02-01"; // 🔥 هنا
 
     return recentOrders.filter(order => {
+const role = localStorage.getItem("userRole");
 
+if (role === "manager" && selectedWarehouseFilter) {
+
+    const match = order.warehouses?.some(w =>
+        (w.base || "").trim().toUpperCase() === selectedWarehouseFilter
+    );
+
+    if (!match) return false;
+}
         const orderDate = getOrderDate(order);
 
         // 🔥 فلترة من تاريخ معين
@@ -460,7 +469,11 @@ const statusColor =
                 ${order.warehouses.map(w => {
 
             const role = localStorage.getItem("userRole");
-
+if (role === "manager") {
+    document.getElementById("warehouseFilter").style.display = "block";
+} else {
+    document.getElementById("warehouseFilter").style.display = "none";
+}
 const isPacking = 
     (currentWarehouse === "Packing Station" || role === "manager") 
     && !w.packed;
@@ -602,6 +615,7 @@ if (receivedBtn) {
 }
 updateFilterButtonsCounts();
 updateFilterButtonsCounts();
+fillWarehouseDropdown();
 }
 
 function reopenOrder(orderNo) {
@@ -1614,3 +1628,32 @@ function autoMoveToPacking() {
     }, { onlyOnce: true });
 
 }
+
+function fillWarehouseDropdown() {
+    const role = localStorage.getItem("userRole");
+    if (role !== "manager") return;
+
+    const dropdown = document.getElementById("warehouseDropdown");
+    if (!dropdown) return;
+
+    const set = new Set();
+
+    recentOrders.forEach(order => {
+        order.warehouses?.forEach(w => {
+            if (w.base) set.add(w.base.trim().toUpperCase());
+        });
+    });
+
+    dropdown.innerHTML = `<option value="">All Warehouses</option>`;
+
+    [...set].sort().forEach(w => {
+        const opt = document.createElement("option");
+        opt.value = w;
+        opt.textContent = w;
+        dropdown.appendChild(opt);
+    });
+}
+document.getElementById("warehouseDropdown").addEventListener("change", function () {
+    selectedWarehouseFilter = this.value;
+    renderRecentOrders();
+});

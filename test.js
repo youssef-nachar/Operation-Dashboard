@@ -15,72 +15,73 @@ let returnedOrders = new Set();
 let returnedOrdersMap = {};
 let localOrders = [];
 function hashData(data) {
-    return JSON.stringify(
-        data
-            .slice()
-            .sort((a, b) => a.orderNo.localeCompare(b.orderNo))
-            .map(o => ({
-                orderNo: o.orderNo,
-                status: o.status,
-                wh: o.warehouses
-                    .slice()
-                    .sort((a, b) => a.base.localeCompare(b.base))
-                    .map(w => w.base + w.packed + w.distributed)
-            }))
-    );
+return JSON.stringify(
+data
+.slice()
+.sort((a, b) => a.orderNo.localeCompare(b.orderNo))
+.map(o => ({
+orderNo: o.orderNo,
+status: o.status,
+wh: o.warehouses
+.slice()
+.sort((a, b) => a.base.localeCompare(b.base))
+.map(w => w.base + w.packed + w.distributed)
+}))
+);
 }
 
 const loginContainer = document.getElementById("loginContainer");
 const dashboard = document.getElementById("dashboard");
 window.addEventListener('DOMContentLoaded', () => {
-    const orderDetails = document.getElementById("orderDetails");
-    if (orderDetails) {
-        orderDetails.addEventListener("click", (e) => {
+const orderDetails = document.getElementById("orderDetails");
+if (orderDetails) {
+orderDetails.addEventListener("click", (e) => {
 
+if (e.target === orderDetails) {  
+            orderDetails.classList.add("hidden");  
+        }  
+        const warehouse = localStorage.getItem("currentWarehouse");  
 
-            if (e.target === orderDetails) {
-                orderDetails.classList.add("hidden");
-            }
-            const warehouse = localStorage.getItem("currentWarehouse");
+        let input = null;  
 
-            let input = null;
+        // 🔵 Packing → البحث  
+        if (warehouse === "Packing Station") {  
+            input = document.getElementById("newOrderSearch");  
+        }  
 
-            // 🔵 Packing → البحث
-            if (warehouse === "Packing Station") {
-                input = document.getElementById("newOrderSearch");
-            }
+        // 🟢 باقي المستخدمين → إدخال الطلب  
+        else {  
+            input = document.getElementById("newOrderNumber");  
+        }  
 
-            // 🟢 باقي المستخدمين → إدخال الطلب
-            else {
-                input = document.getElementById("newOrderNumber");
-            }
+        if (!input) return;  
 
-            if (!input) return;
+        // // focus أولي  
+        // setTimeout(() => {  
+        //     input.focus();  
+        // }, 300);  
 
-            // // focus أولي
-            // setTimeout(() => {
-            //     input.focus();
-            // }, 300);
+        // إذا خرج المؤشر يرجع  
+        input.addEventListener("blur", () => {  
+            if (!document.getElementById("editOrderModal").classList.contains("hidden")) return;
 
-            // إذا خرج المؤشر يرجع
-            input.addEventListener("blur", () => {
-                if (!document.getElementById("editOrderModal").classList.contains("hidden")) return;
+// setTimeout(() => { input.focus();}, 300);
+});
+});
+}
+const loggedIn = localStorage.getItem("isLoggedIn");
+const role = localStorage.getItem("userRole");
 
-// setTimeout(() => { input.focus();}, 300);       
-     });
-        });
-    }
-    const loggedIn = localStorage.getItem("isLoggedIn");
-    const role = localStorage.getItem("userRole");
+if (loggedIn === "true") {
 
-    if (loggedIn === "true") {
 // 🔥 إخفاء العناصر للـ manager
-        loginContainer.style.display = "none";
-        dashboard.classList.remove("hidden");
+loginContainer.style.display = "none";
+dashboard.classList.remove("hidden");
 
-        if (role === "manager") {
-            document.getElementById("teamNotesBtn").style.display = "block";
-            listenToOrders();
+if (role === "manager") {  
+        document.getElementById("teamNotesBtn").style.display = "block";  
+        listenToOrders();
+
 document.getElementById("newOrderNumber")?.style.setProperty("display", "none");
 document.getElementById("warehouseName")?.style.setProperty("display", "none");
 document.getElementById("newWarehouseName")?.style.setProperty("display", "none");
@@ -88,1214 +89,1218 @@ document.getElementById("y")?.style.setProperty("display", "none");
 document.getElementById("n")?.style.setProperty("display", "none");
 document.getElementById("newOrderDate").style.display = "none";
 document.getElementById("newOrderTab")?.classList.add("hidden");
-        } else {
+} else {
 
-            document.querySelector(".kpis").style.display = "none";
-            document.querySelector(".warehouse-container").style.display = "none";
-            document.querySelector(".sales-order").style.display = "none";
+document.querySelector(".kpis").style.display = "none";  
+        document.querySelector(".warehouse-container").style.display = "none";  
+        document.querySelector(".sales-order").style.display = "none";  
 
-            showNewOrderTab();
+        showNewOrderTab();  
 
-            const aside = document.querySelector("aside");
+        const aside = document.querySelector("aside");  
 
-            aside.innerHTML = `
-                <a href="#" onclick="signOut()" style="
-                    width:100%;
-                    padding:12px;
-                    background:#ef4444;
-                    border:none;
-                    border-radius:8px;
-                    color:white;
-                    font-weight:600;
-                    cursor:pointer;
-                ">
-                    Logout
-                </a>
-            `;
-        }
-    }
+        aside.innerHTML = `  
+            <a href="#" onclick="signOut()" style="  
+                width:100%;  
+                padding:12px;  
+                background:#ef4444;  
+                border:none;  
+                border-radius:8px;  
+                color:white;  
+                font-weight:600;  
+                cursor:pointer;  
+            ">  
+                Logout  
+            </a>  
+        `;  
+    }  
+}
+
 });
 
 //   const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSAeWlFZdvqQqrWCq0uJKqxz6boomvVuNal1IYM1tOuoeraNE_ZW2BfYYKr3lKfmldOWOgWAXhz88Ke/pub?output=csv";
 
 let allOrders = [];
 const distributionSheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTecpCEwZ10-Ncz2y0xSsAnNdLXcWDGt_GiAeJlbWYhgg9B8zlhvJ1DeDH8H0NDSg/pub?output=csv";
-let distributedOrders = new Set(); // 
+let distributedOrders = new Set(); //
 
 let distributedOrdersMap = {};
-
 
 // const canceledSheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTecpCEwZ10-Ncz2y0xSsAnNdLXcWDGt_GiAeJlbWYhgg9B8zlhvJ1DeDH8H0NDSg/pub?gid=508410365&single=true&output=csv";
 let canceledOrdersSet = new Set();
 
 async function loadCanceledOrders() {
 
-    const res = await fetch(canceledSheetURL + "&t=" + Date.now(), {
-        cache: "no-store"
-    });
+const res = await fetch(canceledSheetURL + "&t=" + Date.now(), {  
+    cache: "no-store"  
+});  
 
-    const csv = await res.text();
-    const parsed = Papa.parse(csv, { skipEmptyLines: true });
-    const rows = parsed.data;
+const csv = await res.text();  
+const parsed = Papa.parse(csv, { skipEmptyLines: true });  
+const rows = parsed.data;  
 
-    if (!rows.length) return;
+if (!rows.length) return;  
 
-    const headers = rows.shift().map(h => h.toLowerCase().trim());
+const headers = rows.shift().map(h => h.toLowerCase().trim());  
 
-    const ORDER_COL = headers.indexOf("order #"); //  lowercase
+const ORDER_COL = headers.indexOf("order #"); //  lowercase  
 
-    if (ORDER_COL === -1) {
-        console.warn("Canceled column not found", headers);
-        return;
-    }
+if (ORDER_COL === -1) {  
+    console.warn("Canceled column not found", headers);  
+    return;  
+}  
 
-    let newSet = new Set();
+let newSet = new Set();  
 
-    rows.forEach(r => {
-        const orderNo = r[ORDER_COL]?.trim().toUpperCase();
-        if (orderNo) newSet.add(orderNo);
-    });
-    canceledOrdersSet = newSet;
+rows.forEach(r => {  
+    const orderNo = r[ORDER_COL]?.trim().toUpperCase();  
+    if (orderNo) newSet.add(orderNo);  
+});  
+canceledOrdersSet = newSet;  
 
-    allOrders.forEach(order => {
+allOrders.forEach(order => {  
 
-        if (canceledOrdersSet.has(order.orderNo)) {
+    if (canceledOrdersSet.has(order.orderNo)) {  
 
-            order.status = "canceled";
+        order.status = "canceled";  
 
-        }
+    }  
 
-    });
+});  
 
-    console.log("Canceled Orders Loaded:", canceledOrdersSet.size);
+console.log("Canceled Orders Loaded:", canceledOrdersSet.size);
+
 }
 
-
-// LOGIN  
+// LOGIN
 loginForm.onsubmit = e => {
-    e.preventDefault();
+e.preventDefault();
 
-    const u = users.find(
-        x =>
-            x.username === username.value &&
-            x.password === password.value
-    );
+const u = users.find(  
+    x =>  
+        x.username === username.value &&  
+        x.password === password.value  
+);  
 
-    if (!u) {
-        loginError.classList.remove("hidden");
-        return;
-    }
+if (!u) {  
+    loginError.classList.remove("hidden");  
+    return;  
+}  
 
-    loginError.classList.add("hidden");
+loginError.classList.add("hidden");  
 
-    if (u.warehouse === "Packing Station") {
-        autoMoveToPacking();
-    }
+if (u.warehouse === "Packing Station") {  
+    autoMoveToPacking();  
+}  
 
-    // =========================
-    // SAVE SESSION
-    // =========================
-    localStorage.setItem("isLoggedIn", "true");
-    localStorage.setItem("currentWarehouse", u.warehouse);
-    localStorage.setItem("userWarehouse", u.warehouse);
-    localStorage.setItem("userRole", u.role);
+// =========================  
+// SAVE SESSION  
+// =========================  
+localStorage.setItem("isLoggedIn", "true");  
+localStorage.setItem("currentWarehouse", u.warehouse);  
+localStorage.setItem("userWarehouse", u.warehouse);  
+localStorage.setItem("userRole", u.role);  
 
-    // =========================
-    // SWITCH UI
-    // =========================
-    loginContainer.classList.add("hidden");
-    dashboard.classList.remove("hidden");
+// =========================  
+// SWITCH UI  
+// =========================  
+loginContainer.classList.add("hidden");  
+dashboard.classList.remove("hidden");  
 
-    // =========================
-    // ELEMENTS
-    // =========================
-    const teamNotesBtn = document.getElementById("teamNotesBtn");
-    const warehouseSwitcher = document.getElementById("warehouseSwitcher");
-    const kpis = document.querySelector(".kpis");
-    const warehouseContainer = document.querySelector(".warehouse-container");
-    const salesOrder = document.querySelector(".sales-order");
+// =========================  
+// ELEMENTS  
+// =========================  
+const teamNotesBtn = document.getElementById("teamNotesBtn");  
+const warehouseSwitcher = document.getElementById("warehouseSwitcher");  
+const kpis = document.querySelector(".kpis");  
+const warehouseContainer = document.querySelector(".warehouse-container");  
+const salesOrder = document.querySelector(".sales-order");  
 
-    // =========================
-    // RESET UI FIRST (IMPORTANT)
-    // =========================
-    if (teamNotesBtn) teamNotesBtn.classList.add("hidden");
-    if (warehouseSwitcher) warehouseSwitcher.classList.add("hidden");
-    if (kpis) kpis.classList.add("hidden");
-    if (warehouseContainer) warehouseContainer.classList.add("hidden");
-    if (salesOrder) salesOrder.classList.add("hidden");
+// =========================  
+// RESET UI FIRST (IMPORTANT)  
+// =========================  
+if (teamNotesBtn) teamNotesBtn.classList.add("hidden");  
+if (warehouseSwitcher) warehouseSwitcher.classList.add("hidden");  
+if (kpis) kpis.classList.add("hidden");  
+if (warehouseContainer) warehouseContainer.classList.add("hidden");  
+if (salesOrder) salesOrder.classList.add("hidden");  
 
-    // =========================
-    // MANAGER
-    // =========================
-    // =========================
+// =========================  
+// MANAGER  
+// =========================  
+// =========================
+
 // MANAGER
 // =========================
 if (u.role === "manager") {
 
-    // إظهار عناصر المدير فقط
-    if (teamNotesBtn) teamNotesBtn.classList.remove("hidden");
-    if (warehouseSwitcher) warehouseSwitcher.classList.remove("hidden");
-    if (kpis) kpis.classList.remove("hidden");
-    if (warehouseContainer) warehouseContainer.classList.remove("hidden");
-    if (salesOrder) salesOrder.classList.remove("hidden");
+// إظهار عناصر المدير فقط  
+if (teamNotesBtn) teamNotesBtn.classList.remove("hidden");  
+if (warehouseSwitcher) warehouseSwitcher.classList.remove("hidden");  
+if (kpis) kpis.classList.remove("hidden");  
+if (warehouseContainer) warehouseContainer.classList.remove("hidden");  
+if (salesOrder) salesOrder.classList.remove("hidden");  
 
-    // 🔥 إخفاء واجهة إدخال الطلب
-    const newOrderTab = document.getElementById("newOrderTab");
-    if (newOrderTab) {
-        newOrderTab.classList.add("hidden");
-    }
+// 🔥 إخفاء واجهة إدخال الطلب  
+const newOrderTab = document.getElementById("newOrderTab");  
+if (newOrderTab) {  
+    newOrderTab.classList.add("hidden");  
+}
+
 document.getElementById("y").style.display = "none";
 document.getElementById("h").style.display = "none";
 document.getElementById("n").style.display= "none";
 document.getElementById("newOrderDate").style.display = "none";
-    // 🔥 إخفاء input الطلب
-    const newOrderInput = document.getElementById("newOrderNumber");
-    if (newOrderInput) {
-        newOrderInput.style.display = "none";
-    }
-
-    // 🔥 إخفاء اسم المستودع
-    const warehouseName = document.getElementById("warehouseName");
-    if (warehouseName) {
-        warehouseName.style.display = "none";
-    }
-
-    // 🔥 إخفاء newWarehouseName
-    const newWarehouseName = document.getElementById("newWarehouseName");
-
-    if (newWarehouseName) {
-        newWarehouseName.style.display = "none";
-    }
-
-    showDashboardHome();
-    listenToOrders();
-
-    return;
+// 🔥 إخفاء input الطلب
+const newOrderInput = document.getElementById("newOrderNumber");
+if (newOrderInput) {
+newOrderInput.style.display = "none";
 }
-    // =========================
-    // NORMAL USER
-    // =========================
-    showNewOrderTab();
 
-    const aside = document.querySelector("aside");
+// 🔥 إخفاء اسم المستودع  
+const warehouseName = document.getElementById("warehouseName");  
+if (warehouseName) {  
+    warehouseName.style.display = "none";  
+}  
 
-    if (aside) {
-        aside.innerHTML = `
-            <button onclick="signOut()" style="
-                width:100%;
-                padding:12px;
-                background:#ef4444;
-                border:none;
-                border-radius:8px;
-                color:white;
-                font-weight:600;
-                cursor:pointer;
-            ">
-                Logout
-            </button>
-        `;
-    }
+// 🔥 إخفاء newWarehouseName  
+const newWarehouseName = document.getElementById("newWarehouseName");  
+
+if (newWarehouseName) {  
+    newWarehouseName.style.display = "none";  
+}  
+
+showDashboardHome();  
+listenToOrders();  
+
+return;
+
+}
+// =========================
+// NORMAL USER
+// =========================
+showNewOrderTab();
+
+const aside = document.querySelector("aside");  
+
+if (aside) {  
+    aside.innerHTML = `  
+        <button onclick="signOut()" style="  
+            width:100%;  
+            padding:12px;  
+            background:#ef4444;  
+            border:none;  
+            border-radius:8px;  
+            color:white;  
+            font-weight:600;  
+            cursor:pointer;  
+        ">  
+            Logout  
+        </button>  
+    `;  
+}
+
 };
 function getWarehouseBadgeColor(order, warehouse) {
 if (order.status === "returned") {
-    return "#dc2626";
+return "#dc2626";
 }
-    if (
-        order.status === "canceled" ||
-        order.status === "canceled_before_delivery"
-    ) {
-        return "#ef4444";
-    }
+if (
+order.status === "canceled" ||
+order.status === "canceled_before_delivery"
+) {
+return "#ef4444";
+}
 
 if (order.status === "distributed") {
-    return "#22c55e";
+return "#22c55e";
 }
 
 if (order.status === "ready_to_distribute") {
-    return "#3b82f6"; // 🔵 أزرق
+return "#3b82f6"; // 🔵 أزرق
 }
 
-    if (order.status === "partial") {
-        return warehouse.packed ? "#22c55e" : "#f59e0b";
-    }
+if (order.status === "partial") {  
+    return warehouse.packed ? "#22c55e" : "#f59e0b";  
+}  
 
-    if (order.status === "completed") {
-        return "#16a34a";
-    }
+if (order.status === "completed") {  
+    return "#16a34a";  
+}  
 
-    return "#7c2d12";
+return "#7c2d12";
+
 }
 
 let highestOrderCountSeen = 0;
 let highestEffectiveDateSeen = null;
 
 let lastKPI = {
-    total: 0,
-    completed: 0,
-    pending: 0,
-    distributed: 0,
-    ready: 0 // 🔥 جديد
+total: 0,
+completed: 0,
+pending: 0,
+distributed: 0,
+ready: 0 // 🔥 جديد
 };
 
-
-//filteredOrders = Object.values(unique);  
+//filteredOrders = Object.values(unique);
 
 function renderWarehouseBreakdown(orders) {
 
-    const warehouseMap = {};
-    const grandTotal = { t: 0, c: 0, p: 0, d: 0 };
+const warehouseMap = {};  
+const grandTotal = { t: 0, c: 0, p: 0, d: 0 };  
 
-    orders.forEach(order => {
+orders.forEach(order => {
 
 const isDistributed = order.status === "distributed";
 const isReady = order.status === "ready_to_distribute";
-        const seenWH = new Set();
+const seenWH = new Set();
 
-        order.warehouses.forEach(w => {
+order.warehouses.forEach(w => {  
 
-            if (!w.base) return;
+        if (!w.base) return;  
 
-            const base = w.base.trim().toLowerCase();
+        const base = w.base.trim().toLowerCase();  
 
-            // منع التكرار داخل نفس الطلب
-            if (seenWH.has(base)) return;
-            seenWH.add(base);
+        // منع التكرار داخل نفس الطلب  
+        if (seenWH.has(base)) return;  
+        seenWH.add(base);  
 
-            // 🔥 هنا التعديل الأساسي
-            grandTotal.t++; // ✔ كل warehouse يُحسب
+        // 🔥 هنا التعديل الأساسي  
+        grandTotal.t++; // ✔ كل warehouse يُحسب  
 
-            if (!warehouseMap[base]) {
-                warehouseMap[base] = { t: 0, c: 0, p: 0, d: 0 };
-            }
+        if (!warehouseMap[base]) {  
+            warehouseMap[base] = { t: 0, c: 0, p: 0, d: 0 };  
+        }  
 
-            warehouseMap[base].t++;
+        warehouseMap[base].t++;
 
-   if (isDistributed) {
-    warehouseMap[base].d++;
-    grandTotal.d++;
+if (isDistributed) {
+warehouseMap[base].d++;
+grandTotal.d++;
 }
 else if (isReady) {
-    // 🔥 إذا بدك تحسبه مع delivered أو تعمل column جديد
-    warehouseMap[base].d++; // أو تعمل ready column لاحقاً
-    grandTotal.d++;
+// 🔥 إذا بدك تحسبه مع delivered أو تعمل column جديد
+warehouseMap[base].d++; // أو تعمل ready column لاحقاً
+grandTotal.d++;
 }
-            else if (order.status === "completed") {
-                warehouseMap[base].c++;
-                grandTotal.c++;
-            }
-            else {
-                warehouseMap[base].p++;
-                grandTotal.p++;
-            }
-
-        });
-
-    });
-
-    warehouseBreakdownTable.innerHTML = `
-<table>
-<tr>
-<th>Warehouse</th>
-<th>Total</th>
-<th>In-Packing</th>
-<th>Pending</th>
-<th>Delivered</th>
-</tr>
-
-${Object.entries(warehouseMap).map(([wh, v]) => {
-
-        if (!wh || !v) return "";
-
-        const safeWh = wh.replace(/'/g, "\\'");
-
-        return `
-<tr>
-<td>${wh.toUpperCase()}</td>
-<td><a href="#" onclick="showWarehouseOrders('${safeWh}','total')">${v.t}</a></td>
-<td><a href="#" onclick="showWarehouseOrders('${safeWh}','completed')">${v.c}</a></td>
-<td><a href="#" onclick="showWarehouseOrders('${safeWh}','pending')">${v.p}</a></td>
-<td><a href="#" onclick="showWarehouseOrders('${safeWh}','distributed')">${v.d}</a></td>
-</tr>
-`;
-
-    }).join("")}
-
-<tr style="font-weight:bold;background:#020617;color:#22c55e">
-<td>TOTAL</td>
-<td>${grandTotal.t}</td>
-<td>${grandTotal.c}</td>
-<td>${grandTotal.p}</td>
-<td>${grandTotal.d}</td>
-</tr>
-
-</table>
-`;
+else if (order.status === "completed") {
+warehouseMap[base].c++;
+grandTotal.c++;
 }
-function resetFilters() {
+else {
+warehouseMap[base].p++;
+grandTotal.p++;
+}
 
-    // 🔹 إلغاء Today Mode  
-    todayOnlyMode = false;
+});  
 
-    const todayBtn = document.getElementById("todayToggleBtn");
-    if (todayBtn) {
-        todayBtn.style.background = "#020617";
-        todayBtn.style.color = "white";
-        todayBtn.textContent = "Today Only";
-    }
+});  
 
-    // 🔹 إعادة التاريخ للقيمة الافتراضية  
-    const defaultStart = "2026-02-01";  // 01-Feb-2026  
-    const today = new Date().toISOString().slice(0, 10);
+warehouseBreakdownTable.innerHTML = `
 
-    dateFrom.value = defaultStart;
-    dateTo.value = today;
+<table>  
+<tr>  
+<th>Warehouse</th>  
+<th>Total</th>  
+<th>In-Packing</th>  
+<th>Pending</th>  
+<th>Delivered</th>  
+</tr>  ${Object.entries(warehouseMap).map(([wh, v]) => {
 
-    // 🔹 إعادة ترتيب الطلبات  
-    orderSortMode = "newest";
+if (!wh || !v) return "";  
 
-    // 🔹 تحديث الداشبورد  
-    updateDashboard();
-    updateFooterStats();
+    const safeWh = wh.replace(/'/g, "\\'");  
+
+    return `
+
+<tr>  
+<td>${wh.toUpperCase()}</td>  
+<td><a href="#" onclick="showWarehouseOrders('${safeWh}','total')">${v.t}</a></td>  
+<td><a href="#" onclick="showWarehouseOrders('${safeWh}','completed')">${v.c}</a></td>  
+<td><a href="#" onclick="showWarehouseOrders('${safeWh}','pending')">${v.p}</a></td>  
+<td><a href="#" onclick="showWarehouseOrders('${safeWh}','distributed')">${v.d}</a></td>  
+</tr>  
+`;  }).join("")}
+
+<tr style="font-weight:bold;background:#020617;color:#22c55e">  
+<td>TOTAL</td>  
+<td>${grandTotal.t}</td>  
+<td>${grandTotal.c}</td>  
+<td>${grandTotal.p}</td>  
+<td>${grandTotal.d}</td>  
+</tr>  </table>  
+`;  
+}  
+function resetFilters() {  // 🔹 إلغاء Today Mode    
+todayOnlyMode = false;  
+
+const todayBtn = document.getElementById("todayToggleBtn");  
+if (todayBtn) {  
+    todayBtn.style.background = "#020617";  
+    todayBtn.style.color = "white";  
+    todayBtn.textContent = "Today Only";  
+}  
+
+// 🔹 إعادة التاريخ للقيمة الافتراضية    
+const defaultStart = "2026-02-01";  // 01-Feb-2026    
+const today = new Date().toISOString().slice(0, 10);  
+
+dateFrom.value = defaultStart;  
+dateTo.value = today;  
+
+// 🔹 إعادة ترتيب الطلبات    
+orderSortMode = "newest";  
+
+// 🔹 تحديث الداشبورد    
+updateDashboard();  
+updateFooterStats();
+
 }
 
 function FiltersReset() {
 
-    // 🔹 إلغاء Today Mode  
-    todayOnlyMode = false;
+// 🔹 إلغاء Today Mode    
+todayOnlyMode = false;  
 
-    const todayBtn = document.getElementById("todayToggleBtn");
-    if (todayBtn) {
-        todayBtn.style.background = "#020617";
-        todayBtn.style.color = "white";
-        todayBtn.textContent = "Today Only";
-    }
+const todayBtn = document.getElementById("todayToggleBtn");  
+if (todayBtn) {  
+    todayBtn.style.background = "#020617";  
+    todayBtn.style.color = "white";  
+    todayBtn.textContent = "Today Only";  
+}  
 
-    // 🔹 إعادة التاريخ للقيمة الافتراضية  
-    const defaultStart = "2026-02-01";  // 01-Feb-2026  
-    const today = new Date().toISOString().slice(0, 10);
+// 🔹 إعادة التاريخ للقيمة الافتراضية    
+const defaultStart = "2026-02-01";  // 01-Feb-2026    
+const today = new Date().toISOString().slice(0, 10);  
 
-    dateFrom.value = defaultStart;
-    dateTo.value = today;
+dateFrom.value = defaultStart;  
+dateTo.value = today;  
 
-    // 🔹 إعادة ترتيب الطلبات  
-    orderSortMode = "newest";
+// 🔹 إعادة ترتيب الطلبات    
+orderSortMode = "newest";  
 
-    // 🔹 تحديث الداشبورد  
-    updateDashboard();
-    updateFooterStats();
+// 🔹 تحديث الداشبورد    
+updateDashboard();  
+updateFooterStats();
+
 }
 let lastDisplayedOrders = [];
 
-// MULTI-WAREHOUSE ORDERS  
+// MULTI-WAREHOUSE ORDERS
 function renderMultiWHOrders(orders) {
-    const m = orders.filter(x => (x.warehouses?.length || 0) > 1);
-    const completedOrders = m.filter(x => x.status === "completed");
+const m = orders.filter(x => (x.warehouses?.length || 0) > 1);
+const completedOrders = m.filter(x => x.status === "completed");
 const distributedOrders = m.filter(x =>
-    x.status === "distributed" ||
-    x.status === "ready_to_distribute"
+x.status === "distributed" ||
+x.status === "ready_to_distribute"
 );
-    const pendingOrders = m.filter(x => x.status === "pending" || x.status === "partial")
-        .filter(o => !completedOrders.includes(o) && !distributedOrders.includes(o));
+const pendingOrders = m.filter(x => x.status === "pending" || x.status === "partial")
+.filter(o => !completedOrders.includes(o) && !distributedOrders.includes(o));
 
-    multiWHTable.innerHTML = `  
-<table>  
-<tr><th>Type</th><th>Orders</th></tr>  
-<tr><td>Total</td><td><a href="#" onclick="showMultiWHOrders('total')">${m.length}</a></td></tr>  
-<tr><td>In-Packing</td><td><a href="#" onclick="showMultiWHOrders('completed')">${completedOrders.length}</a></td></tr>  
-<tr><td>Pending / partial</td>  
-<td>  
-<a href="#" onclick="showMultiWHOrders('pending')">  
-${pendingOrders.length}</a>  
-</td></tr>  
-<tr><td>Distributed</td><td><a href="#" onclick="showMultiWHOrders('distributed')">${distributedOrders.length}</a></td></tr>  
-</table>`;
-}
+multiWHTable.innerHTML = `
 
-// SINGLE-WAREHOUSE ORDERS  
+<table>    
+<tr><th>Type</th><th>Orders</th></tr>    
+<tr><td>Total</td><td><a href="#" onclick="showMultiWHOrders('total')">${m.length}</a></td></tr>    
+<tr><td>In-Packing</td><td><a href="#" onclick="showMultiWHOrders('completed')">${completedOrders.length}</a></td></tr>    
+<tr><td>Pending / partial</td>    
+<td>    
+<a href="#" onclick="showMultiWHOrders('pending')">    
+${pendingOrders.length}</a>    
+</td></tr>    
+<tr><td>Distributed</td><td><a href="#" onclick="showMultiWHOrders('distributed')">${distributedOrders.length}</a></td></tr>    
+</table>`;  
+}  // SINGLE-WAREHOUSE ORDERS
 function renderSingleWHOrders(orders) {
-    const s = orders.filter(x => x.warehouseCount === 1);
-    const completedOrders = s.filter(x => x.status === "completed");
+const s = orders.filter(x => x.warehouseCount === 1);
+const completedOrders = s.filter(x => x.status === "completed");
 const distributedOrders = s.filter(x =>
-    x.status === "distributed" ||
-    x.status === "ready_to_distribute"
+x.status === "distributed" ||
+x.status === "ready_to_distribute"
 );    const pendingOrders = s.filter(x => x.status === "pending")
-        .filter(o => !completedOrders.includes(o) && !distributedOrders.includes(o));
+.filter(o => !completedOrders.includes(o) && !distributedOrders.includes(o));
 
-    singleWHTable.innerHTML = `  
-<table>  
-<tr><th>Type</th><th>Orders</th></tr>  
-<tr><td>Total</td><td><a href="#" onclick="showSingleWHOrders('total')">${s.length}</a></td></tr>  
-<tr><td>In-Packing</td><td><a href="#" onclick="showSingleWHOrders('completed')">${completedOrders.length}</a></td></tr>  
-<tr>  
-  <td>Pending</td>  
-  <td>  
-    <a href="#" onclick="showSingleWHOrders('pending')">  
-      ${pendingOrders.length}  
-    </a>  
-  </td>  
-</tr>  
-<tr><td>Distributed</td><td><a href="#" onclick="showSingleWHOrders('distributed')">${distributedOrders.length}</a></td></tr>  
-</table>`;
-}
+singleWHTable.innerHTML = `
 
-// SHOW ORDER DETAILS  
+<table>    
+<tr><th>Type</th><th>Orders</th></tr>    
+<tr><td>Total</td><td><a href="#" onclick="showSingleWHOrders('total')">${s.length}</a></td></tr>    
+<tr><td>In-Packing</td><td><a href="#" onclick="showSingleWHOrders('completed')">${completedOrders.length}</a></td></tr>    
+<tr>    
+  <td>Pending</td>    
+  <td>    
+    <a href="#" onclick="showSingleWHOrders('pending')">    
+      ${pendingOrders.length}    
+    </a>    
+  </td>    
+</tr>    
+<tr><td>Distributed</td><td><a href="#" onclick="showSingleWHOrders('distributed')">${distributedOrders.length}</a></td></tr>    
+</table>`;  
+}  // SHOW ORDER DETAILS
 function showOrderDetails(type) {
 
-    const ACCUMULATE_FROM = "2026-02-02";
-    const todayOrders = applyFilters();
+const ACCUMULATE_FROM = "2026-02-02";  
+const todayOrders = applyFilters();  
 
-    let todayFiltered = todayOrders;
+let todayFiltered = todayOrders;  
 
-    if (type === "canceled") {
+if (type === "canceled") {  
 
-        const CANCELED_START_DATE = "2026-02-02";
+    const CANCELED_START_DATE = "2026-02-02";  
 
-        todayFiltered = allOrders.filter(o => {
+    todayFiltered = allOrders.filter(o => {  
 
-            if (
-                o.status !== "canceled" &&
-                o.status !== "canceled_before_delivery"
-            ) return false;
+        if (  
+            o.status !== "canceled" &&  
+            o.status !== "canceled_before_delivery"  
+        ) return false;  
 
-            const dateToCheck = getEffectiveDate(o);
-            if (!dateToCheck) return false;
+        const dateToCheck = getEffectiveDate(o);  
+        if (!dateToCheck) return false;  
 
-            return dateToCheck >= CANCELED_START_DATE;
-        });
-    }
+        return dateToCheck >= CANCELED_START_DATE;  
+    });  
+}
+
 if (type === "returned") {
-    todayFiltered = todayOrders.filter(o =>
-        o.status === "returned"
-    );
+todayFiltered = todayOrders.filter(o =>
+o.status === "returned"
+);
 }
-    if (type === "completed") {
-        todayFiltered = todayOrders.filter(o => o.status === "completed");
-    }
+if (type === "completed") {
+todayFiltered = todayOrders.filter(o => o.status === "completed");
+}
 
-    if (type === "pending") {
-        todayFiltered = todayOrders.filter(o =>
-            (o.status === "pending" || o.status === "partial")
-            && o.status !== "canceled"
-        );
-    }
+if (type === "pending") {  
+    todayFiltered = todayOrders.filter(o =>  
+        (o.status === "pending" || o.status === "partial")  
+        && o.status !== "canceled"  
+    );  
+}  
 
-    if (type === "distributed") {
-        todayFiltered = todayOrders.filter(o => o.status === "distributed");
-    }
+if (type === "distributed") {  
+    todayFiltered = todayOrders.filter(o => o.status === "distributed");  
+}
+
 if (type === "ready") {
-    todayFiltered = todayOrders.filter(o =>
-        o.status === "ready_to_distribute"
-    );
+todayFiltered = todayOrders.filter(o =>
+o.status === "ready_to_distribute"
+);
 }
-    if (type === "total") {
-        todayFiltered = todayOrders;
-    }
-
-    let backlogOrders = [];
-
-    if (type === "completed" || type === "pending") {
-
-        backlogOrders = allOrders.filter(o => {
-
-            const dateToCheck = getEffectiveDate(o);
-
-            if (!dateToCheck) return false;
-            if (dateToCheck < ACCUMULATE_FROM) return false;
-            if (todayFiltered.includes(o)) return false;
-
-            if (type === "completed") return o.status === "completed";
-            if (type === "pending") return o.status === "pending" || o.status === "partial";
-
-            return false;
-        });
-    }
-
-    lastTodayOrders = todayFiltered;
-    lastBacklogOrders = backlogOrders;
-    lastType = type;
-
-    displayOrdersWithBacklog(todayFiltered, backlogOrders, type);
+if (type === "total") {
+todayFiltered = todayOrders;
 }
 
+let backlogOrders = [];  
 
+if (type === "completed" || type === "pending") {  
+
+    backlogOrders = allOrders.filter(o => {  
+
+        const dateToCheck = getEffectiveDate(o);  
+
+        if (!dateToCheck) return false;  
+        if (dateToCheck < ACCUMULATE_FROM) return false;  
+        if (todayFiltered.includes(o)) return false;  
+
+        if (type === "completed") return o.status === "completed";  
+        if (type === "pending") return o.status === "pending" || o.status === "partial";  
+
+        return false;  
+    });  
+}  
+
+lastTodayOrders = todayFiltered;  
+lastBacklogOrders = backlogOrders;  
+lastType = type;  
+
+displayOrdersWithBacklog(todayFiltered, backlogOrders, type);
+
+}
 
 let lastTodayOrders = [];
 let lastBacklogOrders = [];
 let lastType = null;
 
+function displayOrdersWithBacklog(todayOrders, backlogOrders, type) {
 
-  function displayOrdersWithBacklog(todayOrders, backlogOrders, type) {
+const orderList = document.getElementById("orderList");  
 
-        const orderList = document.getElementById("orderList");
+    function buildTable(orders) {  
 
-        function buildTable(orders) {
+        if (!orders.length) {  
+            return `<p style="color:#9ca3af">No orders found.</p>`;  
+        }  
+        orders.sort((a, b) => {  
 
-            if (!orders.length) {
-                return `<p style="color:#9ca3af">No orders found.</p>`;
-            }
-            orders.sort((a, b) => {
+            const dateA =  
+                a.status === "distributed"  
+                    ? distributedOrdersMap[a.orderNo]?.date  
+                    : a.date;  
 
-                const dateA =
-                    a.status === "distributed"
-                        ? distributedOrdersMap[a.orderNo]?.date
-                        : a.date;
+            const dateB =  
+                b.status === "distributed"  
+                    ? distributedOrdersMap[b.orderNo]?.date  
+                    : b.date;  
 
-                const dateB =
-                    b.status === "distributed"
-                        ? distributedOrdersMap[b.orderNo]?.date
-                        : b.date;
+            return new Date(dateB) - new Date(dateA); // ⬅️ من الأقدم للأحدث  
 
-                return new Date(dateB) - new Date(dateA); // ⬅️ من الأقدم للأحدث
+        });  
+        return `  
+    <table>  
+       <tr>  
+<th>Order #</th>  
+<th>Warehouses</th>  
+<th>Status</th>  
+<th>Comment</th>
 
-            });
-            return `
-        <table>
-           <tr>
-    <th>Order #</th>
-    <th>Warehouses</th>
-    <th>Status</th>
-    <th>Comment</th>
-</tr>
-            ${orders.map(order => {
+</tr>  
+            ${orders.map(order => {  let statusText =  
+                order.status === "canceled" ? "Canceled" :  
+                order.status === "distributed" ? "Distributed"  : order.status === "ready_to_distribute"  ? "Ready to Distribute" :  
+                order.status === "completed" ? "In-Packing" :
 
-                let statusText =
-                    order.status === "canceled" ? "Canceled" :
-                    order.status === "distributed" ? "Distributed"  : order.status === "ready_to_distribute"  ? "Ready to Distribute" :
-                    order.status === "completed" ? "In-Packing" :
 order.status === "returned" ? "Returned" :
-                     order.status === "partial" ? "Partial" : "Pending";
+order.status === "partial" ? "Partial" : "Pending";
 
-                return `
-                <tr>
-                    <td>${order.orderNo}</td>
-                    <td>
-                        ${order.warehouses.map(w => {
+return `  
+            <tr>  
+                <td>${order.orderNo}</td>  
+                <td>  
+                    ${order.warehouses.map(w => {  
 
-                    const badgeColor = getWarehouseBadgeColor(order, w);
+                const badgeColor = getWarehouseBadgeColor(order, w);  
 
-                    let tooltipText = "";
+                let tooltipText = "";  
 
-                    if (order.status === "distributed" || order.status === "ready_to_distribute") {
-    tooltipText = `
-        Ready/Distributed at: 
-        ${distributedOrdersMap[order.orderNo]?.date 
-          || order.readyTime 
-          || "-"}
-    `;
-}
-                    else if (w.packed) {
-                        tooltipText = `
-        Received: ${w.receivedTime || "-"} 
-        <br>
-        Packed: ${w.packingTime || "-"}
-    `;
-                    }
-                    else {
-                        tooltipText = `Received in Warehouse: ${w.receivedTime || "-"}`;
-                    }
-
-                    return `
-        <div class="tooltip-wrapper">
-            <span style="
-                display:inline-block;
-                margin:2px;
-                padding:4px 8px;
-                border-radius:6px;
-                font-size:12px;
-                font-weight:600;
-                background:${badgeColor};
-                color:black;
-                cursor:pointer;
-            ">
-                ${w.base.toUpperCase()}
-            </span>
-            <div class="tooltip-box">
-                ${tooltipText}
-            </div>
-        </div>
-    `;
-                }).join("")}
-                    </td>
-                    <td>${statusText}</td>
-                    <td style="color:#38bdf8;font-size:12px">
-    ${order.comment ? `
-<div style="
-    margin-top:5px;
-    color:#22c55e;
-    font-size:11px;
-">
-💬 ${order.comment}
-</div>
-` : ""}
-</td>
-                </tr>
-                `;
-            }).join("")}
-        </table>
-    `;
-        }
-
-        let html = `
-    <div style="display:flex;gap:10px;margin-bottom:15px">
-        <button onclick="toggleBacklogView(false)" class="toggle-btn">
-            All
-        </button>
-        <button onclick="toggleBacklogView(true)" class="toggle-btn">
-            Show Only Backlog
-        </button>
-    </div>
+                if (order.status === "distributed" || order.status === "ready_to_distribute") {  
+tooltipText = `  
+    Ready/Distributed at:   
+    ${distributedOrdersMap[order.orderNo]?.date   
+      || order.readyTime   
+      || "-"}  
 `;
 
-        if (!showOnlyBacklog) {
-            html += `
-        <h3 style="color:#22c55e;margin-bottom:10px">
-            Today Orders (${todayOrders.length})
-        </h3>
-        ${buildTable(todayOrders)}
-    `;
-        }
-
-        if (backlogOrders.length) {
-
-            // 🔥 تجميع الطلبات حسب التاريخ الفعلي
-            const grouped = {};
-
-            backlogOrders.forEach(order => {
-
-                const dateKey = getEffectiveDate(order) || "No Date";
-
-                if (!grouped[dateKey]) {
-                    grouped[dateKey] = [];
-                }
-
-                grouped[dateKey].push(order);
-            });
-
-            // ترتيب التواريخ من الأحدث للأقدم
-            const sortedDates = Object.keys(grouped)
-                .sort((a, b) => new Date(b) - new Date(a));
-
-            html += `
-        <h3 style="color:#f59e0b;margin:30px 0 10px 0">
-            Backlog Orders (${backlogOrders.length})
-        </h3>
-    `;
-
-            sortedDates.forEach(date => {
-
-                html += `
-            <h4 style="
-                margin:20px 0 8px 0;
-                color:#eab308;
-                font-weight:600;
-                border-bottom:1px solid #1f2937;
-                padding-bottom:4px;
-            ">
-                📅 ${date}
-            </h4>
-        `;
-
-                html += buildTable(grouped[date]);
-            });
-        }
-
-        orderList.innerHTML = html;
-
-        document.getElementById("orderDetails").classList.remove("hidden");
-    }
-    function toggleBacklogView(value) {
-        showOnlyBacklog = value;
-        updateLastOrderDetailsView();
-    }
-    function updateLastOrderDetailsView() {
-        displayOrdersWithBacklog(lastTodayOrders, lastBacklogOrders, lastType);
-    }
-    // SHOW WAREHOUSE ORDERS  
-    function showWarehouseOrders(warehouse, type) {
-        let o = applyFilters();
-
-        if (warehouse !== 'all') {
-o = o.filter(order =>
-    order.warehouses.some(w =>
-        normalizeWarehouse(w.base).base === normalizeWarehouse(warehouse).base
-    )
-);
-        }
-
-        if (type === "completed") o = o.filter(x => x.status === "completed");
-        if (type === "pending") o = o.filter(x => x.status === "pending" || x.status === "partial");
-if (type === "distributed") {
-    o = o.filter(x =>
-        x.status === "distributed" ||
-        x.status === "ready_to_distribute"
-    );
 }
-        if (type === "total") o = o; // all filtered orders  
+else if (w.packed) {
+tooltipText = `
+    Received: ${w.receivedTime || "-"} <br>
+    Packed: ${w.packingTime || "-"}
+`;
+}
+else {
+tooltipText = `Received in Warehouse: ${w.receivedTime || "-"}`;
+}
 
-        displayOrders(o, warehouse === 'all' ? 'All Warehouses' : `Warehouse: ${warehouse}`);
-    }
+return `  
+    <div class="tooltip-wrapper">  
+        <span style="  
+            display:inline-block;  
+            margin:2px;  
+            padding:4px 8px;  
+            border-radius:6px;  
+            font-size:12px;  
+            font-weight:600;  
+            background:${badgeColor};  
+            color:black;  
+            cursor:pointer;  
+        ">  
+            ${w.base.toUpperCase()}  
+        </span>  
+        <div class="tooltip-box">  
+            ${tooltipText}  
+        </div>  
+    </div>  
+`;  
+            }).join("")}  
+                </td>  
+                <td>${statusText}</td>  
+                <td style="color:#38bdf8;font-size:12px">  
+${order.comment ? `
 
+<div style="  
+    margin-top:5px;  
+    color:#22c55e;  
+    font-size:11px;  
+">  
+💬 ${order.comment}  
+</div>  
+` : ""}  
+</td>  
+                </tr>  
+                `;  
+            }).join("")}  
+        </table>  
+    `;  
+        }  let html = `  
+<div style="display:flex;gap:10px;margin-bottom:15px">  
+    <button onclick="toggleBacklogView(false)" class="toggle-btn">  
+        All  
+    </button>  
+    <button onclick="toggleBacklogView(true)" class="toggle-btn">  
+        Show Only Backlog  
+    </button>  
+</div>
 
-// SHOW MULTI/SINGLE-WAREHOUSE ORDERS  
+`;
+
+if (!showOnlyBacklog) {  
+        html += `  
+    <h3 style="color:#22c55e;margin-bottom:10px">  
+        Today Orders (${todayOrders.length})  
+    </h3>  
+    ${buildTable(todayOrders)}  
+`;  
+    }  
+
+    if (backlogOrders.length) {  
+
+        // 🔥 تجميع الطلبات حسب التاريخ الفعلي  
+        const grouped = {};  
+
+        backlogOrders.forEach(order => {  
+
+            const dateKey = getEffectiveDate(order) || "No Date";  
+
+            if (!grouped[dateKey]) {  
+                grouped[dateKey] = [];  
+            }  
+
+            grouped[dateKey].push(order);  
+        });  
+
+        // ترتيب التواريخ من الأحدث للأقدم  
+        const sortedDates = Object.keys(grouped)  
+            .sort((a, b) => new Date(b) - new Date(a));  
+
+        html += `  
+    <h3 style="color:#f59e0b;margin:30px 0 10px 0">  
+        Backlog Orders (${backlogOrders.length})  
+    </h3>  
+`;  
+
+        sortedDates.forEach(date => {  
+
+            html += `  
+        <h4 style="  
+            margin:20px 0 8px 0;  
+            color:#eab308;  
+            font-weight:600;  
+            border-bottom:1px solid #1f2937;  
+            padding-bottom:4px;  
+        ">  
+            📅 ${date}  
+        </h4>  
+    `;  
+
+            html += buildTable(grouped[date]);  
+        });  
+    }  
+
+    orderList.innerHTML = html;  
+
+    document.getElementById("orderDetails").classList.remove("hidden");  
+}  
+function toggleBacklogView(value) {  
+    showOnlyBacklog = value;  
+    updateLastOrderDetailsView();  
+}  
+function updateLastOrderDetailsView() {  
+    displayOrdersWithBacklog(lastTodayOrders, lastBacklogOrders, lastType);  
+}  
+// SHOW WAREHOUSE ORDERS    
+function showWarehouseOrders(warehouse, type) {  
+    let o = applyFilters();  
+
+    if (warehouse !== 'all') {
+
+o = o.filter(order =>
+order.warehouses.some(w =>
+normalizeWarehouse(w.base).base === normalizeWarehouse(warehouse).base
+)
+);
+}
+
+if (type === "completed") o = o.filter(x => x.status === "completed");  
+    if (type === "pending") o = o.filter(x => x.status === "pending" || x.status === "partial");
+
+if (type === "distributed") {
+o = o.filter(x =>
+x.status === "distributed" ||
+x.status === "ready_to_distribute"
+);
+}
+if (type === "total") o = o; // all filtered orders
+
+displayOrders(o, warehouse === 'all' ? 'All Warehouses' : `Warehouse: ${warehouse}`);  
+}
+
+// SHOW MULTI/SINGLE-WAREHOUSE ORDERS
 function showMultiWHOrders(type) {
-    let o = applyFilters().filter(x => x.warehouseCount > 1);
-    if (type === "completed") o = o.filter(x => x.status === "completed");
-    if (type === "pending") {
-        o = o.filter(x =>
-            x.status === "pending" || x.status === "partial"
-        );
-    } if (type === "distributed") o = o.filter(x => x.status === "distributed");
-    displayOrders(o, "Multi-Warehouse Orders");
+let o = applyFilters().filter(x => x.warehouseCount > 1);
+if (type === "completed") o = o.filter(x => x.status === "completed");
+if (type === "pending") {
+o = o.filter(x =>
+x.status === "pending" || x.status === "partial"
+);
+} if (type === "distributed") o = o.filter(x => x.status === "distributed");
+displayOrders(o, "Multi-Warehouse Orders");
 }
 
 function showSingleWHOrders(type) {
-    let o = applyFilters().filter(x => x.warehouseCount === 1);
-    if (type === "completed") o = o.filter(x => x.status === "completed");
-    if (type === "pending") o = o.filter(x => x.status === "pending");
-    if (type === "distributed") o = o.filter(x => x.status === "distributed");
-    displayOrders(o, "Single-Warehouse Orders");
+let o = applyFilters().filter(x => x.warehouseCount === 1);
+if (type === "completed") o = o.filter(x => x.status === "completed");
+if (type === "pending") o = o.filter(x => x.status === "pending");
+if (type === "distributed") o = o.filter(x => x.status === "distributed");
+displayOrders(o, "Single-Warehouse Orders");
 }
-
 
 const toggleToDateBtn = document.getElementById("toggleToDate");
 const dateToInput = document.getElementById("dateTo");
 
-
-// CLOSE MODAL  
+// CLOSE MODAL
 
 function normalizeWarehouse(name) {
-    if (!name) return { base: "", packed: false };
+if (!name) return { base: "", packed: false };
 
-    const raw = name.toLowerCase();
+const raw = name.toLowerCase();  
 
-    const packed = /pack/.test(raw);
+const packed = /pack/.test(raw);  
 
-    const base = raw
-        .replace(/pack/gi, "")
-        .replace(/wh/gi, "")
-        .replace(/['’\s]/g, "")
-        .replace(/[-_]+/g, " ")
-        .replace(/\s+/g, " ")
-        .trim()
-        .toUpperCase();
-    return { base, packed };
+const base = raw  
+    .replace(/pack/gi, "")  
+    .replace(/wh/gi, "")  
+    .replace(/['’\s]/g, "")  
+    .replace(/[-_]+/g, " ")  
+    .replace(/\s+/g, " ")  
+    .trim()  
+    .toUpperCase();  
+return { base, packed };
+
 }
 function signOut() {
-    clearInterval(refreshTimer);
-    refreshTimer = null;
+clearInterval(refreshTimer);
+refreshTimer = null;
 
-    localStorage.removeItem("isLoggedIn");
+localStorage.removeItem("isLoggedIn");  
 
-    localStorage.removeItem("currentWarehouse");
+localStorage.removeItem("currentWarehouse");  
 
-    location.reload();
-    dashboard.classList.add("hidden");
-    loginContainer.style.display = "flex";
+location.reload();  
+dashboard.classList.add("hidden");  
+loginContainer.style.display = "flex";
 
 }
 document.addEventListener("mouseover", function (e) {
 
-    const row = e.target.closest(".order-row");
-    if (!row) return;
+const row = e.target.closest(".order-row");  
+if (!row) return;  
 
-    const tooltip = document.getElementById("tooltip");
+const tooltip = document.getElementById("tooltip");  
 
-    const status = row.dataset.status;
-    const receivedWH = row.dataset.wh;
-    const receivedPack = row.dataset.pack;
+const status = row.dataset.status;  
+const receivedWH = row.dataset.wh;  
+const receivedPack = row.dataset.pack;  
 
-    let text = "";
+let text = "";  
 
-    if (status === "pending" || status === "partial") {
-        text = "Received at WH: " + receivedWH;
-    }
+if (status === "pending" || status === "partial") {  
+    text = "Received at WH: " + receivedWH;  
+}  
 
-    if (status === "completed") {
-        text = "Received at Packing Station: " + receivedPack;
-    }
+if (status === "completed") {  
+    text = "Received at Packing Station: " + receivedPack;  
+}  
 
-    if (!text) return;
+if (!text) return;  
 
-    tooltip.textContent = text;
-    tooltip.classList.remove("hidden");
+tooltip.textContent = text;  
+tooltip.classList.remove("hidden");
+
 });
 
 document.addEventListener("mousemove", function (e) {
-    const tooltip = document.getElementById("tooltip");
-    tooltip.style.top = (e.pageY + 15) + "px";
-    tooltip.style.left = (e.pageX + 15) + "px";
+const tooltip = document.getElementById("tooltip");
+tooltip.style.top = (e.pageY + 15) + "px";
+tooltip.style.left = (e.pageX + 15) + "px";
 });
 
 document.addEventListener("mouseout", function (e) {
-    if (e.target.closest(".order-row")) {
-        document.getElementById("tooltip").classList.add("hidden");
-    }
+if (e.target.closest(".order-row")) {
+document.getElementById("tooltip").classList.add("hidden");
+}
 });
 
 const newOrderInput = document.getElementById("newOrderNumber");
 
 newOrderInput.addEventListener("input", function () {
 
-    const value = this.value.trim();
-    const pattern = /^#m\d{5}$/i;
+const value = this.value.trim();  
+const pattern = /^#m\d{5}$/i;  
 
-    const currentWarehouse = localStorage.getItem("currentWarehouse");
+const currentWarehouse = localStorage.getItem("currentWarehouse");  
 
-    // 🔵 إذا المستخدم Packing Station
-    if (currentWarehouse === "Packing Station") {
+// 🔵 إذا المستخدم Packing Station  
+if (currentWarehouse === "Packing Station") {  
 
-        // يعمل مثل search فقط
-        updateSearch();
+    // يعمل مثل search فقط  
+    updateSearch();  
 
-        // يبقي المؤشر داخل input
-        // setTimeout(() => {
-        //     this.focus();
-        // }, 0);
+    // يبقي المؤشر داخل input  
+    // setTimeout(() => {  
+    //     this.focus();  
+    // }, 0);  
 
-        return;
-    }
+    return;  
+}  
 
-    // باقي المستخدمين يحفظ الطلب
-    if (pattern.test(value)) {
+// باقي المستخدمين يحفظ الطلب  
+if (pattern.test(value)) {  
 
-        if (this.dataset.saved === value) return;
+    if (this.dataset.saved === value) return;  
 
-        this.dataset.saved = value;
+    this.dataset.saved = value;  
 
-        saveNewOrder();
+    saveNewOrder();  
 
-        this.value = "";
+    this.value = "";  
 
-    }
+}
 
 });
 
 document.getElementById("newOrderSearch")
-    .addEventListener("input", function () {
+.addEventListener("input", function () {
 
-        const query = this.value.toLowerCase().trim();
-        const cards = document.querySelectorAll("#newOrdersList > div");
+const query = this.value.toLowerCase().trim();  
+    const cards = document.querySelectorAll("#newOrdersList > div");  
 
-        cards.forEach(card => {
+    cards.forEach(card => {  
 
-            const text = card.innerText.toLowerCase();
+        const text = card.innerText.toLowerCase();  
 
-            if (text.includes(query)) {
-                card.style.display = "flex";
-            } else {
-                card.style.display = "none";
-            }
+        if (text.includes(query)) {  
+            card.style.display = "flex";  
+        } else {  
+            card.style.display = "none";  
+        }  
 
-        });
-    });
-
-
+    });  
+});
 
 function getOrderWarehouse(orderNo) {
-    const order = allOrders.find(o => o.orderNo.toUpperCase() === orderNo.toUpperCase());
-    if (!order) return null;
+const order = allOrders.find(o => o.orderNo.toUpperCase() === orderNo.toUpperCase());
+if (!order) return null;
 
-    // إذا الطلب من أكثر من مستودع، نرجع أول مستودع غير PACKING
-    const originalWH = order.warehouses.find(w => w.base.toUpperCase() !== "PACKING STATION");
-    return originalWH ? originalWH.base : "";
+// إذا الطلب من أكثر من مستودع، نرجع أول مستودع غير PACKING  
+const originalWH = order.warehouses.find(w => w.base.toUpperCase() !== "PACKING STATION");  
+return originalWH ? originalWH.base : "";
+
 }
 
 // إغلاق عند الضغط خارجها
 document.addEventListener("click", function () {
-    const menu = document.getElementById("quickDateMenu");
-    if (menu) menu.style.display = "none";
+const menu = document.getElementById("quickDateMenu");
+if (menu) menu.style.display = "none";
 });
 document.addEventListener("click", () => {
-    const menu = document.getElementById("quickDateMenu");
-    if (menu) menu.style.display = "none";
+const menu = document.getElementById("quickDateMenu");
+if (menu) menu.style.display = "none";
 });
 function clearDateFilter() {
-    document.getElementById("dateFrom").value = "";
-    document.getElementById("dateTo").value = "";
-    DateFilter();
+document.getElementById("dateFrom").value = "";
+document.getElementById("dateTo").value = "";
+DateFilter();
 }
 
 let lastDistributionHash = "";
 let distributionCache = {};
 function hashDistribution(dataMap) {
-    return JSON.stringify(
-        Object.keys(dataMap)
-            .sort()
-            .map(key => ({
-                orderNo: key,
-                date: dataMap[key].date,
-                company: dataMap[key].company
-            }))
-    );
+return JSON.stringify(
+Object.keys(dataMap)
+.sort()
+.map(key => ({
+orderNo: key,
+date: dataMap[key].date,
+company: dataMap[key].company
+}))
+);
 }
 function updateDashboard() {
-    for (const order of allOrders) {
-        order.status = resolveOrderStatus(order);
-    }
+for (const order of allOrders) {
+order.status = resolveOrderStatus(order);
+}
 allOrders.forEach(order => {
 
-    if (returnedOrders.has(order.orderNo)) {
+if (returnedOrders.has(order.orderNo)) {  
 
-        order.status = "returned";
-    }
+    order.status = "returned";  
+}
 
 });
-const todayOrders = Array.isArray(applyFilters()) 
-    ? applyFilters() 
-    : Object.values(applyFilters() || {});
-    const ACCUMULATE_FROM = "2026-02-02";
+const todayOrders = Array.isArray(applyFilters())
+? applyFilters()
+: Object.values(applyFilters() || {});
+const ACCUMULATE_FROM = "2026-02-02";
 
-    const accumulatedOrders = allOrders.filter(o => {
-        const dateToCheck = getEffectiveDate(o);
-        if (!dateToCheck) return false;
-        return dateToCheck >= ACCUMULATE_FROM;
-
-
-        order.status = resolveOrderStatus(order); // الحالة الأصلية
-
-    });
+const accumulatedOrders = allOrders.filter(o => {  
+    const dateToCheck = getEffectiveDate(o);  
+    if (!dateToCheck) return false;  
+    return dateToCheck >= ACCUMULATE_FROM;  
 
 
-    // ================= TODAY =================
-    const CANCELED_START_DATE = "2026-02-02";
+    order.status = resolveOrderStatus(order); // الحالة الأصلية  
 
-    const canceledToday = allOrders.filter(o => {
+});  
 
-        if (
-            o.status !== "canceled" &&
-            o.status !== "canceled_before_delivery"
-        ) return false;
 
-        const dateToCheck = getEffectiveDate(o);
-        if (!dateToCheck) return false;
+// ================= TODAY =================  
+const CANCELED_START_DATE = "2026-02-02";  
 
-        return dateToCheck >= CANCELED_START_DATE;
-    });
+const canceledToday = allOrders.filter(o => {  
+
+    if (  
+        o.status !== "canceled" &&  
+        o.status !== "canceled_before_delivery"  
+    ) return false;  
+
+    const dateToCheck = getEffectiveDate(o);  
+    if (!dateToCheck) return false;  
+
+    return dateToCheck >= CANCELED_START_DATE;  
+});
+
 const returnedToday = todayOrders.filter(o =>
-    o.status === "returned"
+o.status === "returned"
 );
 const distributedToday = todayOrders.filter(isDistributed);
 const readyToday = todayOrders.filter(o =>
-    o.status === "ready_to_distribute"
+o.status === "ready_to_distribute"
 );
-    const completedToday = todayOrders.filter(o => o.status === "completed");
-    const pendingToday = todayOrders.filter(o =>
-        (o.status === "pending" || o.status === "partial")
-        && o.status !== "canceled"
-    );
+const completedToday = todayOrders.filter(o => o.status === "completed");
+const pendingToday = todayOrders.filter(o =>
+(o.status === "pending" || o.status === "partial")
+&& o.status !== "canceled"
+);
 
-    // ================= BACKLOG =================
+// ================= BACKLOG =================  
 
-    const completedBacklog = accumulatedOrders.filter(o =>
-        o.status === "completed"
-    );
+const completedBacklog = accumulatedOrders.filter(o =>  
+    o.status === "completed"  
+);  
 
-    const pendingBacklog = accumulatedOrders.filter(o =>
-        o.status === "pending" || o.status === "partial"
-    );
+const pendingBacklog = accumulatedOrders.filter(o =>  
+    o.status === "pending" || o.status === "partial"  
+);
+
 const distributedBacklog = accumulatedOrders.filter(o =>
-    o.status === "distributed"
+o.status === "distributed"
 );
 
 const readyBacklog = accumulatedOrders.filter(o =>
-    o.status === "ready_to_distribute"
+o.status === "ready_to_distribute"
 );
-    // ================= DISPLAY =================
+// ================= DISPLAY =================
 updateKPINumber("returned", returnedToday.length);
-    updateKPINumber("total", todayOrders.length);
-    updateKPINumber("distributed", distributedToday.length);
-    updateKPINumber("ready", readyToday.length);
-    updateKPINumber("canceled", canceledToday.length);
+updateKPINumber("total", todayOrders.length);
+updateKPINumber("distributed", distributedToday.length);
+updateKPINumber("ready", readyToday.length);
+updateKPINumber("canceled", canceledToday.length);
 
-    updateKPIWithBacklog("completed", completedToday.length, completedBacklog.length);
-    updateKPIWithBacklog("pending", pendingToday.length, pendingBacklog.length);
+updateKPIWithBacklog("completed", completedToday.length, completedBacklog.length);  
+updateKPIWithBacklog("pending", pendingToday.length, pendingBacklog.length);  
 
-    renderWarehouseBreakdown(todayOrders);
-    renderMultiWHOrders(todayOrders);
-    renderSingleWHOrders(todayOrders);
+renderWarehouseBreakdown(todayOrders);  
+renderMultiWHOrders(todayOrders);  
+renderSingleWHOrders(todayOrders);
+
 }
 function updateKPIWithBacklog(id, todayValue, backlogValue) {
 
-    const container = document.getElementById(id);
-    const main = container.querySelector(".main-number");
-    const sub = container.querySelector(".sub-number");
+const container = document.getElementById(id);  
+const main = container.querySelector(".main-number");  
+const sub = container.querySelector(".sub-number");  
 
-    main.textContent = todayValue;
+main.textContent = todayValue;  
 
-    if (backlogValue > todayValue) {
-        const backlogOnly = backlogValue - todayValue;
-        sub.textContent = `(+${backlogOnly} backlog)`;
-    } else {
-        sub.textContent = "";
-    }
+if (backlogValue > todayValue) {  
+    const backlogOnly = backlogValue - todayValue;  
+    sub.textContent = `(+${backlogOnly} backlog)`;  
+} else {  
+    sub.textContent = "";  
+}
+
 }
 
 function updateKPINumber(id, newValue) {
-    if (lastKPI[id] === newValue) return;
+if (lastKPI[id] === newValue) return;
 
-    lastKPI[id] = newValue;
-    document.getElementById(id).textContent = newValue;
-    const element = document.getElementById(id);
-    const currentValue = lastKPI[id];
+lastKPI[id] = newValue;  
+document.getElementById(id).textContent = newValue;  
+const element = document.getElementById(id);  
+const currentValue = lastKPI[id];  
 
-    // إذا زاد → فقط أضف الفرق
-    if (newValue > currentValue) {
-        const diff = newValue - currentValue;
-        lastKPI[id] += diff;
-        element.textContent = lastKPI[id];
-        return;
-    }
+// إذا زاد → فقط أضف الفرق  
+if (newValue > currentValue) {  
+    const diff = newValue - currentValue;  
+    lastKPI[id] += diff;  
+    element.textContent = lastKPI[id];  
+    return;  
+}  
 
-    // إذا نقص (تغيير فلتر مثلاً) → حدّث مباشرة
+// إذا نقص (تغيير فلتر مثلاً) → حدّث مباشرة  
 
-    element.textContent = newValue;
+element.textContent = newValue;
+
 }
 function showDistributedOrders() {
 
-    const from = dateFrom.value || null;
-    const to = dateTo.value || null;
+const from = dateFrom.value || null;  
+const to = dateTo.value || null;  
 
-    const orders = allOrders.filter(o => {
+const orders = allOrders.filter(o => {  
 
-        const distData = distributedOrdersMap[o.orderNo];
+    const distData = distributedOrdersMap[o.orderNo];  
 
-        if (!distData) return false;
+    if (!distData) return false;  
 
-        const distDate = distData.date;
+    const distDate = distData.date;  
 
-        if (from && distDate < from) return false;
-        if (to && distDate > to) return false;
+    if (from && distDate < from) return false;  
+    if (to && distDate > to) return false;  
 
-        return true;
-    });
+    return true;  
+});  
 
-    displayOrders(orders, "Distributed Orders");
+displayOrders(orders, "Distributed Orders");
+
 }
 function loadDistributedOrders() {
 
-    return fetch(distributionSheetURL + "&t=" + Date.now(), {
-        cache: "no-store"
-    })
-        .then(r => r.text())
-        .then(csv => {
+return fetch(distributionSheetURL + "&t=" + Date.now(), {  
+    cache: "no-store"  
+})  
+    .then(r => r.text())  
+    .then(csv => {  
 
-            const parsed = Papa.parse(csv, { skipEmptyLines: true });
-            const rows = parsed.data;
+        const parsed = Papa.parse(csv, { skipEmptyLines: true });  
+        const rows = parsed.data;  
 
-            if (!rows.length) return;
+        if (!rows.length) return;  
 
-            const headers = rows
-                .shift()
-                .map(h => h.toString().trim().toLowerCase());
+        const headers = rows  
+            .shift()  
+            .map(h => h.toString().trim().toLowerCase());  
 
-            const ORDER_COL = headers.indexOf("request number");
-            const DATE_COL = headers.indexOf("request registration date time");
-            const COMPANY_COL = headers.findIndex(h => h.includes("company"));
+        const ORDER_COL = headers.indexOf("request number");  
+        const DATE_COL = headers.indexOf("request registration date time");  
+        const COMPANY_COL = headers.findIndex(h => h.includes("company"));  
 
-            if (ORDER_COL === -1 || DATE_COL === -1) {
+        if (ORDER_COL === -1 || DATE_COL === -1) {  
 
-                console.warn("❌ Distribution columns not found");
-                return;
-            }
+            console.warn("❌ Distribution columns not found");  
+            return;  
+        }  
 
-            let newMap = {};
+        let newMap = {};  
 
-            rows.forEach(r => {
+        rows.forEach(r => {  
 
-                const orderNo =
-                    r[ORDER_COL]?.trim().toUpperCase();
+            const orderNo =  
+                r[ORDER_COL]?.trim().toUpperCase();  
 
-                const rawDate = r[DATE_COL];
+            const rawDate = r[DATE_COL];  
 
-                const company =
-                    COMPANY_COL !== -1
-                        ? r[COMPANY_COL]?.trim()
-                        : "";
+            const company =  
+                COMPANY_COL !== -1  
+                    ? r[COMPANY_COL]?.trim()  
+                    : "";  
 
-                if (!orderNo || !rawDate) return;
+            if (!orderNo || !rawDate) return;  
 
-                const formattedDate =
-                    formatDateForInput(rawDate);
+            const formattedDate =  
+                formatDateForInput(rawDate);  
 
-                if (!formattedDate) return;
+            if (!formattedDate) return;  
 
-                newMap[orderNo] = {
+            newMap[orderNo] = {  
 
-                    date: formattedDate,
+                date: formattedDate,  
 
-                    company: company || "LMD"
-                };
-            });
+                company: company || "LMD"  
+            };  
+        });  
 
-            // ✅ دمج الطلبات الموزعة يدوياً من Firebase
-            allOrders.forEach(order => {
+        // ✅ دمج الطلبات الموزعة يدوياً من Firebase  
+        allOrders.forEach(order => {  
 
-                if (
-                    order.status === "distributed" &&
-                    order.distributedDate
-                ) {
+            if (  
+                order.status === "distributed" &&  
+                order.distributedDate  
+            ) {  
 
-                    // إذا غير موجود بالـ CSV
-                    if (!newMap[order.orderNo]) {
+                // إذا غير موجود بالـ CSV  
+                if (!newMap[order.orderNo]) {  
 
-                        newMap[order.orderNo] = {
+                    newMap[order.orderNo] = {  
 
-                            date: order.distributedDate,
+                        date: order.distributedDate,  
 
-                            company:
-                                order.company ||
-                                order.batch?.company ||
-                                "LMD"
-                        };
-                    }
-                }
-            });
+                        company:  
+                            order.company ||  
+                            order.batch?.company ||  
+                            "LMD"  
+                    };  
+                }  
+            }  
+        });  
 
-            const newHash = hashDistribution(newMap);
+        const newHash = hashDistribution(newMap);  
 
-            // 🔥 BLOCK إذا رجعت نسخة قديمة
-            if (
-                lastDistributionHash &&
-                newHash === lastDistributionHash
-            ) {
-                return;
-            }
+        // 🔥 BLOCK إذا رجعت نسخة قديمة  
+        if (  
+            lastDistributionHash &&  
+            newHash === lastDistributionHash  
+        ) {  
+            return;  
+        }  
 
-            // 🔥 لو النسخة أقدم تجاهلها
-            if (
-                Object.keys(newMap).length <
-                Object.keys(distributionCache).length
-            ) {
+        // 🔥 لو النسخة أقدم تجاهلها  
+        if (  
+            Object.keys(newMap).length <  
+            Object.keys(distributionCache).length  
+        ) {  
 
-                console.warn(
-                    "⚠️ Older distribution snapshot blocked"
-                );
+            console.warn(  
+                "⚠️ Older distribution snapshot blocked"  
+            );  
 
-                return;
-            }
+            return;  
+        }  
 
-            // ✅ اعتماد النسخة الجديدة
-            distributionCache = newMap;
+        // ✅ اعتماد النسخة الجديدة  
+        distributionCache = newMap;  
 
-            distributedOrdersMap = newMap;
+        distributedOrdersMap = newMap;  
 
-            lastDistributionHash = newHash;
+        lastDistributionHash = newHash;  
 
-            updateDashboard();
+        updateDashboard();  
 
-            console.log(
-                "✅ Distribution updated safely"
-            );
-        })
-        .catch(err => {
+        console.log(  
+            "✅ Distribution updated safely"  
+        );  
+    })  
+    .catch(err => {  
 
-            console.error(
-                "Distribution load error:",
-                err
-            );
-        });
+        console.error(  
+            "Distribution load error:",  
+            err  
+        );  
+    });
+
 }
-
 
 // function clearAllOrders() {
 
@@ -1310,454 +1315,767 @@ function loadDistributedOrders() {
 // }
 function showReturnTab() {
 
-    document.getElementById("dashboardHeader")
-        .style.display = "none";
+document.getElementById("dashboardHeader")  
+    .style.display = "none";  
 
-    document.getElementById("newOrderTab")
-        .classList.add("hidden");
+document.getElementById("newOrderTab")  
+    .classList.add("hidden");  
 
-    document.getElementById("teamNotesTab")
-        .classList.add("hidden");
+document.getElementById("teamNotesTab")  
+    .classList.add("hidden");  
 
-    document.getElementById("readyTab")
-        .classList.add("hidden");
+document.getElementById("readyTab")  
+    .classList.add("hidden");  
 
-    // 🔥 إظهار return tab
-    document.getElementById("returnTab")
-        .classList.remove("hidden");
+// 🔥 إظهار return tab  
+document.getElementById("returnTab")  
+    .classList.remove("hidden");  
 
-    // 🔥 إخفاء الداشبورد
-    document.querySelector(".kpis")
-        .classList.add("hidden");
+// 🔥 إخفاء الداشبورد  
+document.querySelector(".kpis")  
+    .classList.add("hidden");  
 
-    document.querySelector(".warehouse-container")
-        .classList.add("hidden");
+document.querySelector(".warehouse-container")  
+    .classList.add("hidden");  
 
-    document.querySelector(".sales-order")
-        .classList.add("hidden");
+document.querySelector(".sales-order")  
+    .classList.add("hidden");  
 
-    
-    // 🔥 render مباشر
-    renderReturnedOrders();
+  
+// 🔥 render مباشر  
+renderReturnedOrders();  
 
-    // 🔥 focus على input
-    setTimeout(() => {
+// 🔥 focus على input  
+setTimeout(() => {  
 
-        const input =
-            document.getElementById("returnOrderInput");
+    const input =  
+        document.getElementById("returnOrderInput");  
 
-        if (input) input.focus();
+    if (input) input.focus();  
 
-    }, 200);
+}, 200);
+
 }
 document.getElementById("returnOrderInput")
 .addEventListener("keydown", function(e) {
 
-    if (e.key !== "Enter") return;
+if (e.key !== "Enter") return;  
 
-    const orderNo = this.value
-        .trim()
-        .toUpperCase();
+const orderNo = this.value  
+    .trim()  
+    .toUpperCase();  
 
-    if (!orderNo) return;
+if (!orderNo) return;  
 
-    const order = allOrders.find(o =>
-        o.orderNo.toUpperCase() === orderNo
-    );
+const order = allOrders.find(o =>  
+    o.orderNo.toUpperCase() === orderNo  
+);  
 
-    if (!order) {
+if (!order) {  
 
-        alert("Order not found");
-        return;
-    }
+    alert("Order not found");  
+    return;  
+}  
 
-    // 🔥 تحديده Returned
-    returnedOrders.add(orderNo);
+// 🔥 تحديده Returned  
+returnedOrders.add(orderNo);  
 
-    // 🔥 جلب المستودع تلقائياً
-    const warehouse =
-        getOrderWarehouse(orderNo);
+// 🔥 جلب المستودع تلقائياً  
+const warehouse =  
+    getOrderWarehouse(orderNo);
+
 document.getElementById("returnOrderInput")
-    returnedOrdersMap[orderNo] = {
-        warehouse,
-        date: new Date()
-            .toISOString()
-            .slice(0, 10)
-    };
+returnedOrdersMap[orderNo] = {
+warehouse,
+date: new Date()
+.toISOString()
+.slice(0, 10)
+};
 saveReturnedOrders();
-    // تحديث الحالة
-    order.status = "returned";
+// تحديث الحالة
+order.status = "returned";
 
-    // تحديث الواجهة
-    updateDashboard();
+// تحديث الواجهة  
+updateDashboard();  
 
-    renderReturnedOrders();
+renderReturnedOrders();  
 
-    this.value = "";
+this.value = "";
+
 });
 function renderReturnedOrders() {
 
-    const container =
-        document.getElementById("returnedOrdersList");
+const container =  
+    document.getElementById("returnedOrdersList");  
 
-    const orders =
-        Object.keys(returnedOrdersMap);
+const orders =  
+    Object.keys(returnedOrdersMap);  
 
-    if (!orders.length) {
+if (!orders.length) {  
 
-        container.innerHTML =
-            "<p>No returned orders</p>";
+    container.innerHTML =  
+        "<p>No returned orders</p>";  
 
-        return;
-    }
+    return;  
+}  
 
-    container.innerHTML = `
-        <table>
-            <tr>
-                <th>Order</th>
-                <th>Warehouse</th>
-                <th>Date</th>
-            </tr>
+container.innerHTML = `  
+    <table>  
+        <tr>  
+            <th>Order</th>  
+            <th>Warehouse</th>  
+            <th>Date</th>  
+        </tr>  
 
-            ${orders.map(orderNo => {
+        ${orders.map(orderNo => {  
 
-                const data =
-                    returnedOrdersMap[orderNo];
+            const data =  
+                returnedOrdersMap[orderNo];  
 
-                return `
-                    <tr>
-                        <td>${orderNo}</td>
-                        <td>${data.warehouse}</td>
-                        <td>${data.date}</td>
-                    </tr>
-                `;
-            }).join("")}
-        </table>
-    `;
+            return `  
+                <tr>  
+                    <td>${orderNo}</td>  
+                    <td>${data.warehouse}</td>  
+                    <td>${data.date}</td>  
+                </tr>  
+            `;  
+        }).join("")}  
+    </table>  
+`;
+
 }
 const savedReturnedOrders =
-    JSON.parse(
-        localStorage.getItem("returnedOrders") || "[]"
-    );
+JSON.parse(
+localStorage.getItem("returnedOrders") || "[]"
+);
 
 returnedOrders = new Set(savedReturnedOrders);
 
 returnedOrdersMap =
-    JSON.parse(
-        localStorage.getItem("returnedOrdersMap") || "{}"
-    );
+JSON.parse(
+localStorage.getItem("returnedOrdersMap") || "{}"
+);
 function saveReturnedOrders() {
 
-    localStorage.setItem(
-        "returnedOrders",
-        JSON.stringify([...returnedOrders])
-    );
+localStorage.setItem(  
+    "returnedOrders",  
+    JSON.stringify([...returnedOrders])  
+);  
 
-    localStorage.setItem(
-        "returnedOrdersMap",
-        JSON.stringify(returnedOrdersMap)
-    );
+localStorage.setItem(  
+    "returnedOrdersMap",  
+    JSON.stringify(returnedOrdersMap)  
+);
+
 }
 
 function toggleWarehouseMenu(event) {
 
-    event.preventDefault();
+event.preventDefault();  
 
-    const menu =
-        document.getElementById("warehouseMenu");
+const menu =  
+    document.getElementById("warehouseMenu");  
 
-    menu.classList.toggle("hidden");
+menu.classList.toggle("hidden");
+
 }
-
 
 function loginAsWarehouse(warehouseName) {
 
-    const user = users.find(
-        u => u.warehouse === warehouseName
-    );
+const user = users.find(  
+    u => u.warehouse === warehouseName  
+);  
 
-    if (!user) {
-        alert("Warehouse user not found");
-        return;
-    }
+if (!user) {  
+    alert("Warehouse user not found");  
+    return;  
+}  
 
-    // حفظ بيانات الدخول
-    localStorage.setItem("isLoggedIn", "true");
-    localStorage.setItem("currentWarehouse", user.warehouse);
-    localStorage.setItem("userWarehouse", user.warehouse);
-    localStorage.setItem("userRole", user.role);
+// حفظ بيانات الدخول  
+localStorage.setItem("isLoggedIn", "true");  
+localStorage.setItem("currentWarehouse", user.warehouse);  
+localStorage.setItem("userWarehouse", user.warehouse);  
+localStorage.setItem("userRole", user.role);  
 
-    // إعادة تحميل الصفحة
-    location.reload();
+// إعادة تحميل الصفحة  
+location.reload();
+
 }
 
 function showReportsTab() {
 
-    document.getElementById("dashboardHeader").style.display = "none";
+document.getElementById("dashboardHeader").style.display = "none";  
 
-    document.getElementById("newOrderTab")
-        ?.classList.add("hidden");
+document.getElementById("newOrderTab")  
+    ?.classList.add("hidden");  
 
-    document.getElementById("teamNotesTab")
-        ?.classList.add("hidden");
+document.getElementById("teamNotesTab")  
+    ?.classList.add("hidden");  
 
-    document.getElementById("readyTab")
-        ?.classList.add("hidden");
+document.getElementById("readyTab")  
+    ?.classList.add("hidden");  
 
-    document.getElementById("returnTab")
-        ?.classList.add("hidden");
+document.getElementById("returnTab")  
+    ?.classList.add("hidden");  
 
-    document.getElementById("reportsTab")
-        ?.classList.remove("hidden");
+document.getElementById("reportsTab")  
+    ?.classList.remove("hidden");  
 
-    document.querySelector(".kpis")
-        ?.classList.add("hidden");
+document.querySelector(".kpis")  
+    ?.classList.add("hidden");  
 
-    document.querySelector(".warehouse-container")
-        ?.classList.add("hidden");
+document.querySelector(".warehouse-container")  
+    ?.classList.add("hidden");  
 
-    document.querySelector(".sales-order")
-        ?.classList.add("hidden");
+document.querySelector(".sales-order")  
+    ?.classList.add("hidden");
+
 }
 function getReportDate(order) {
 
-    if (!order) return "";
+if (!order) return "";  
 
-    if (
-        distributedOrdersMap &&
-        distributedOrdersMap[order.orderNo]
-    ) {
+if (  
+    distributedOrdersMap &&  
+    distributedOrdersMap[order.orderNo]  
+) {  
 
-        return distributedOrdersMap[
-            order.orderNo
-        ].date || "";
-    }
+    return distributedOrdersMap[  
+        order.orderNo  
+    ].date || "";  
+}  
 
-    return (
-        order.date ||
-        getEffectiveDate(order) ||
-        ""
-    );
+return (  
+    order.date ||  
+    getEffectiveDate(order) ||  
+    ""  
+);
+
 }
 function formatStatus(status) {
 
-    switch (status) {
+switch (status) {  
 
-        case "completed":
-            return "In Packing";
+    case "completed":  
+        return "In Packing";  
 
-        case "distributed":
-            return "Distributed";
+    case "distributed":  
+        return "Distributed";  
 
-        case "ready_to_distribute":
-            return "Ready To Distribute";
+    case "ready_to_distribute":  
+        return "Ready To Distribute";  
 
-        case "partial":
-            return "Partial";
+    case "partial":  
+        return "Partial";  
 
-        case "returned":
-            return "Returned";
+    case "returned":  
+        return "Returned";  
 
-        case "canceled":
-            return "Canceled";
+    case "canceled":  
+        return "Canceled";  
 
-        default:
-            return "Pending";
-    }
+    default:  
+        return "Pending";  
+}
+
 }
 
 function exportReport(reportName, orders) {
 
-    try {
+try {  
 
-        if (!orders?.length) {
+    if (!orders?.length) {  
 
-            alert("No orders found");
-            return;
-        }
+        alert("No orders found");  
+        return;  
+    }  
 
-        // 🔥 بيانات خفيفة فقط
-        const rows = orders.map(order => ({
+    // 🔥 بيانات خفيفة فقط  
+    const rows = orders.map(order => ({  
 
-            Order: order.orderNo || "",
+        Order: order.orderNo || "",  
 
-            Status: formatStatus(
-                order.status || ""
-            ),
+        Status: formatStatus(  
+            order.status || ""  
+        ),  
 
-            Warehouses:
-                order.warehouses?.length || 0,
+        Warehouses:  
+            order.warehouses?.length || 0,  
 
-            Date:
-                getReportDate(order) || ""
+        Date:  
+            getReportDate(order) || ""  
 
-        }));
+    }));  
 
-        // 🔥 Loading UI
-        const loading =
-            document.getElementById("exportLoading");
+    // 🔥 Loading UI  
+    const loading =  
+        document.getElementById("exportLoading");  
 
-        if (loading) {
-            loading.style.display = "flex";
-        }
+    if (loading) {  
+        loading.style.display = "flex";  
+    }  
 
-        // 🔥 إنشاء Worker
-        const worker = new Worker(
-            "./excel-worker.js"
-        );
+    // 🔥 إنشاء Worker  
+    const worker = new Worker(  
+        "./excel-worker.js"  
+    );  
 
-        worker.postMessage({
-            reportName,
-            rows
-        });
+    worker.postMessage({  
+        reportName,  
+        rows  
+    });  
 
-        worker.onmessage = function (e) {
+    worker.onmessage = function (e) {  
 
-            if (loading) {
-                loading.style.display = "none";
-            }
+        if (loading) {  
+            loading.style.display = "none";  
+        }  
 
-            const data = e.data;
+        const data = e.data;  
 
-            if (!data.success) {
+        if (!data.success) {  
 
-                alert(
-                    "Export failed: " +
-                    data.error
-                );
+            alert(  
+                "Export failed: " +  
+                data.error  
+            );  
 
-                worker.terminate();
+            worker.terminate();  
 
-                return;
-            }
+            return;  
+        }  
 
-            // 🔥 تنزيل الملف
-            const blob = new Blob(
-                [data.buffer],
-                {
-                    type:
-                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                }
-            );
+        // 🔥 تنزيل الملف  
+        const blob = new Blob(  
+            [data.buffer],  
+            {  
+                type:  
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"  
+            }  
+        );  
 
-            const url =
-                URL.createObjectURL(blob);
+        const url =  
+            URL.createObjectURL(blob);  
 
-            const a =
-                document.createElement("a");
+        const a =  
+            document.createElement("a");  
 
-            a.href = url;
+        a.href = url;  
 
-            a.download = data.fileName;
+        a.download = data.fileName;  
 
-            document.body.appendChild(a);
+        document.body.appendChild(a);  
 
-            a.click();
+        a.click();  
 
-            a.remove();
+        a.remove();  
 
-            URL.revokeObjectURL(url);
+        URL.revokeObjectURL(url);  
 
-            worker.terminate();
-        };
+        worker.terminate();  
+    };  
 
-    } catch (err) {
+} catch (err) {  
 
-        console.error(err);
+    console.error(err);  
 
-        alert(err.message);
-    }
+    alert(err.message);  
+}
+
 }
 function exportDailyReport() {
 
-    const today =
-        new Date()
-        .toISOString()
-        .slice(0, 10);
+const today =  
+    new Date()  
+    .toISOString()  
+    .slice(0, 10);  
 
-    const orders =
-        allOrders.filter(order => {
+const orders =  
+    allOrders.filter(order => {  
 
-            const date =
-                getReportDate(order);
+        const date =  
+            getReportDate(order);  
 
-            return date === today;
-        });
+        return date === today;  
+    });  
 
-    exportReport(
-        `Daily_Report_${today}`,
-        orders
-    );
+exportReport(  
+    `Daily_Report_${today}`,  
+    orders  
+);
+
 }
 function exportWeeklyReport() {
 
-    const today = new Date();
+const today = new Date();  
 
-    const weekAgo = new Date();
+const weekAgo = new Date();  
 
-    weekAgo.setDate(
-        today.getDate() - 7
-    );
+weekAgo.setDate(  
+    today.getDate() - 7  
+);  
 
-    const orders =
-        allOrders.filter(order => {
+const orders =  
+    allOrders.filter(order => {  
 
-            const rawDate =
-                getReportDate(order);
+        const rawDate =  
+            getReportDate(order);  
 
-            if (!rawDate) return false;
+        if (!rawDate) return false;  
 
-            const date =
-                new Date(rawDate);
+        const date =  
+            new Date(rawDate);  
 
-            return (
-                !isNaN(date) &&
-                date >= weekAgo &&
-                date <= today
-            );
-        });
+        return (  
+            !isNaN(date) &&  
+            date >= weekAgo &&  
+            date <= today  
+        );  
+    });  
 
-    exportReport(
-        `Weekly_Report_${
-            today.toISOString().slice(0,10)
-        }`,
-        orders
-    );
+exportReport(  
+    `Weekly_Report_${  
+        today.toISOString().slice(0,10)  
+    }`,  
+    orders  
+);
+
 }
 function exportMonthlyReport() {
 
-    const today = new Date();
+const today = new Date();  
 
-    const month =
-        today.getMonth();
+const month =  
+    today.getMonth();  
 
-    const year =
-        today.getFullYear();
+const year =  
+    today.getFullYear();  
 
-    const orders =
-        allOrders.filter(order => {
+const orders =  
+    allOrders.filter(order => {  
 
-            const rawDate =
-                getReportDate(order);
+        const rawDate =  
+            getReportDate(order);  
 
-            if (!rawDate) return false;
+        if (!rawDate) return false;  
 
-            const date =
-                new Date(rawDate);
+        const date =  
+            new Date(rawDate);  
 
-            return (
-                !isNaN(date) &&
-                date.getMonth() === month &&
-                date.getFullYear() === year
-            );
-        });
+        return (  
+            !isNaN(date) &&  
+            date.getMonth() === month &&  
+            date.getFullYear() === year  
+        );  
+    });  
 
-    exportReport(
-        `Monthly_Report_${
-            year
-        }_${
-            month + 1
-        }`,
-        orders
-    );
+exportReport(  
+    `Monthly_Report_${  
+        year  
+    }_${  
+        month + 1  
+    }`,  
+    orders  
+);
+
+}
+async function exportAdvancedExcel() {
+
+const from =  
+    document.getElementById("advancedFromDate").value;  
+
+const to =  
+    document.getElementById("advancedToDate").value;  
+
+if (!from || !to) {  
+
+    alert("Select date range");  
+    return;  
+}  
+
+const orders = allOrders.filter(order => {  
+
+    const date = getReportDate(order);  
+
+    if (!date) return false;  
+
+    return date >= from && date <= to;  
+});  
+
+if (!orders.length) {  
+
+    alert("No orders found");  
+    return;  
+}  
+
+// =========================  
+// COUNTS  
+// =========================  
+
+const total = orders.length;  
+
+const completed =  
+    orders.filter(o =>  
+        o.status === "completed"  
+    ).length;  
+
+const pending =  
+    orders.filter(o =>  
+        o.status === "pending" ||  
+        o.status === "partial"  
+    ).length;  
+
+const distributed =  
+    orders.filter(o =>  
+        o.status === "distributed"  
+    ).length;  
+
+const ready =  
+    orders.filter(o =>  
+        o.status === "ready_to_distribute"  
+    ).length;  
+
+const returned =  
+    orders.filter(o =>  
+        o.status === "returned"  
+    ).length;  
+
+const canceled =  
+    orders.filter(o =>  
+        o.status === "canceled"  
+    ).length;  
+
+// =========================  
+// PERCENTAGES  
+// =========================  
+
+const percent = val =>  
+    ((val / total) * 100).toFixed(1);  
+
+// =========================  
+// UI STATS  
+// =========================  
+
+document.getElementById("reportStats").innerHTML = `  
+
+    ${buildReportCard(  
+        "Total Orders",  
+        total,  
+        "100%"  
+    )}  
+
+    ${buildReportCard(  
+        "In Packing",  
+        completed,  
+        percent(completed) + "%"  
+    )}  
+
+    ${buildReportCard(  
+        "Pending",  
+        pending,  
+        percent(pending) + "%"  
+    )}  
+
+    ${buildReportCard(  
+        "Distributed",  
+        distributed,  
+        percent(distributed) + "%"  
+    )}  
+
+    ${buildReportCard(  
+        "Ready",  
+        ready,  
+        percent(ready) + "%"  
+    )}  
+
+    ${buildReportCard(  
+        "Returned",  
+        returned,  
+        percent(returned) + "%"  
+    )}  
+
+    ${buildReportCard(  
+        "Canceled",  
+        canceled,  
+        percent(canceled) + "%"  
+    )}  
+`;  
+
+// =========================  
+// EXPORT ROWS  
+// =========================  
+
+const rows = orders.map(order => ({  
+
+    "Order #": order.orderNo,  
+
+    "Status":  
+        formatStatus(order.status),  
+
+    "Warehouse Count":  
+        order.warehouses?.length || 0,  
+
+    "Warehouses":  
+        order.warehouses  
+            ?.map(w => w.base)  
+            .join(", "),  
+
+    "Date":  
+        getReportDate(order)  
+}));  
+
+// =========================  
+// SUMMARY  
+// =========================  
+
+const summaryRows = [  
+
+    {  
+        Metric: "Total Orders",  
+        Count: total,  
+        Percentage: "100%"  
+    },  
+
+    {  
+        Metric: "In Packing",  
+        Count: completed,  
+        Percentage:  
+            percent(completed) + "%"  
+    },  
+
+    {  
+        Metric: "Pending",  
+        Count: pending,  
+        Percentage:  
+            percent(pending) + "%"  
+    },  
+
+    {  
+        Metric: "Distributed",  
+        Count: distributed,  
+        Percentage:  
+            percent(distributed) + "%"  
+    },  
+
+    {  
+        Metric: "Ready",  
+        Count: ready,  
+        Percentage:  
+            percent(ready) + "%"  
+    },  
+
+    {  
+        Metric: "Returned",  
+        Count: returned,  
+        Percentage:  
+            percent(returned) + "%"  
+    },  
+
+    {  
+        Metric: "Canceled",  
+        Count: canceled,  
+        Percentage:  
+            percent(canceled) + "%"  
+    }  
+];  
+
+// =========================  
+// EXCEL  
+// =========================  
+
+const wb = XLSX.utils.book_new();  
+
+const ordersSheet =  
+    XLSX.utils.json_to_sheet(rows);  
+
+const summarySheet =  
+    XLSX.utils.json_to_sheet(summaryRows);  
+
+XLSX.utils.book_append_sheet(  
+    wb,  
+    ordersSheet,  
+    "Orders"  
+);  
+
+XLSX.utils.book_append_sheet(  
+    wb,  
+    summarySheet,  
+    "Summary"  
+);  
+
+// WIDTHS  
+ordersSheet["!cols"] = [  
+    { wch: 18 },  
+    { wch: 20 },  
+    { wch: 18 },  
+    { wch: 40 },  
+    { wch: 18 }  
+];  
+
+summarySheet["!cols"] = [  
+    { wch: 25 },  
+    { wch: 15 },  
+    { wch: 15 }  
+];  
+
+// DOWNLOAD  
+XLSX.writeFile(  
+    wb,  
+    `Report_${from}_to_${to}.xlsx`  
+);
+
+}
+function buildReportCard(title, value, percent) {
+
+return `  
+    <div style="  
+        background:#1e293b;  
+        padding:18px;  
+        border-radius:12px;  
+        text-align:center;  
+    ">  
+
+        <div style="  
+            color:#94a3b8;  
+            font-size:13px;  
+            margin-bottom:8px;  
+        ">  
+            ${title}  
+        </div>  
+
+        <div style="  
+            color:white;  
+            font-size:28px;  
+            font-weight:800;  
+        ">  
+            ${value}  
+        </div>  
+
+        <div style="  
+            margin-top:8px;  
+            color:#22c55e;  
+            font-size:14px;  
+            font-weight:700;  
+        ">  
+            ${percent}  
+        </div>  
+
+    </div>  
+`;
+
+}
+
+function toggleAdvancedReports() {
+
+    const box = document.getElementById("advancedReportBox");
+    const btn = document.getElementById("toggleAdvancedReportsBtn");
+
+    box.classList.toggle("hidden");
+
+    if (box.classList.contains("hidden")) {
+        btn.innerHTML = "📊 Open Analytics";
+    } else {
+        btn.innerHTML = "❌ Hide Analytics";
+    }
+
 }

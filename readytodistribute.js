@@ -1,27 +1,33 @@
 
 let appSettings = {
-    batches: [
+    batchTypes: {
+
+    Wakilni: [
         {
-            name: "Batch 1",
+            name: "Wakilni Batch 1",
             from: "10:00",
-            to: "11:30"
-        },
-        {
-            name: "Batch 2",
-            from: "11:30",
-            to: "13:00"
-        },
-        {
-            name: "Batch 3",
-            from: "13:00",
-            to: "15:30"
-        },
-        {
-            name: "Wakilni",
-            from: "15:30",
-            to: "23:59"
+            to: "12:00"
         }
     ],
+
+    Employee: [
+        {
+            name: "Employee Batch 1",
+            from: "12:00",
+            to: "15:00"
+        }
+    ],
+
+    LMD: [
+        {
+            name: "LMD Batch 1",
+            from: "15:00",
+            to: "23:59"
+        }
+    ]
+},
+
+selectedBatchType: "Wakilni",
 
     batchesColumns: 2,
 
@@ -29,6 +35,7 @@ let appSettings = {
 
     readyPageColor: "#38bdf8"
 };
+
 function renderSingleBatch(title, orders) {
 
     return `
@@ -57,31 +64,68 @@ function renderBatchesTable() {
 
     const container = document.getElementById("batchesTable");
 
+    if (!container) return;
+
     const grouped = {};
 
     allOrders.forEach(o => {
+
         if (!o.batch) return;
-const batchName = o.batch?.name || "No Batch";
 
-if (!grouped[batchName]) {
-    grouped[batchName] = [];
-}
+        const batchType = o.batch?.type || "Unknown";
+        const batchName = o.batch?.name || "No Batch";
 
-grouped[batchName].push(o);
+        const fullName = `${batchType} - ${batchName}`;
+
+        if (!grouped[fullName]) {
+            grouped[fullName] = [];
+        }
+
+        grouped[fullName].push(o);
+
     });
 
-    const html = Object.keys(grouped).map(batchName => {
-        return renderSingleBatch(batchName, grouped[batchName]);
-    }).join("");
+    if (!Object.keys(grouped).length) {
+
+        container.innerHTML = `
+        <div style="
+            padding:20px;
+            text-align:center;
+            color:#64748b;
+        ">
+            No batches distributed yet
+        </div>
+        `;
+
+        return;
+    }
+
+    const html = Object.keys(grouped)
+        .map(batchName => renderSingleBatch(batchName, grouped[batchName]))
+        .join("");
 
     container.innerHTML = `
-        <h3 style="color:#38bdf8">📦 Batches</h3>
-        <div style="display:grid;grid-template-columns:repeat(${appSettings.batchesColumns},1fr);gap:20px">
+        <h3 style="color:#38bdf8;margin-bottom:15px">
+            📦 Distribution Batches
+        </h3>
+
+        <div style="
+            display:grid;
+            grid-template-columns:repeat(${appSettings.batchesColumns},1fr);
+            gap:20px;
+        ">
             ${html}
         </div>
     `;
 }
 let editingReadyOrderNo = null;
+function getCurrentBatchList() {
+
+    return appSettings.batchTypes[
+        appSettings.selectedBatchType
+    ] || [];
+
+}
 function getCurrentBatch() {
 
     const now = new Date();
@@ -89,7 +133,9 @@ function getCurrentBatch() {
     const currentMinutes =
         now.getHours() * 60 + now.getMinutes();
 
-    for (const batch of appSettings.batches) {
+    const batches = getCurrentBatchList();
+
+for (const batch of batches) {
 
         const [fromH, fromM] = batch.from.split(":").map(Number);
         const [toH, toM] = batch.to.split(":").map(Number);
@@ -101,11 +147,17 @@ function getCurrentBatch() {
             currentMinutes >= fromMinutes &&
             currentMinutes < toMinutes
         ) {
-            return batch.name;
+            return {
+    type: appSettings.selectedBatchType,
+    name: batch.name
+};
         }
     }
 
-    return "No Batch";
+    return {
+    type: appSettings.selectedBatchType,
+    name: "No Batch"
+};
 }
 function openReadyEditModal(orderNo, boxes, cbm) {
 
@@ -272,29 +324,75 @@ function showReadyToDistributeTab() {
 
     container.innerHTML = `
     <div style="
-        display:grid;
-        grid-template-columns: 1fr 1.5fr;
-        gap:20px;
-        padding:20px;
-        max-width:1200px;
-        margin:auto;
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:20px;
+">
+
+<div>
+    <div style="
+    color:#64748b;
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:2px;
     ">
+        Logistics Operations
+    </div>
+
+    <h2 style="
+    margin:0;
+    color:white;
+    font-size:28px;
+    ">
+        Ready To Distribute
+    </h2>
+</div>
+
+<div style="
+background:#0ea5e922;
+color:#38bdf8;
+padding:8px 14px;
+border-radius:30px;
+font-size:12px;
+font-weight:700;
+">
+LIVE
+</div>
+
+</div>
+<div style="
+display:grid;
+grid-template-columns:380px 1fr;
+gap:24px;
+padding:24px;
+max-width:1600px;
+margin:auto;
+background:
+radial-gradient(circle at top right,#0ea5e922 0%,transparent 40%),
+linear-gradient(180deg,#020617,#0f172a);
+min-height:100vh;
+">
 
         <!-- LEFT PANEL (INPUTS) -->
-        <div style="
-            background:#0f172a;
-            border:1px solid #1f2937;
-            padding:18px;
-            border-radius:16px;
-            height:fit-content;
-            position:sticky;
-            top:20px;
-        ">
+<div style="
+background:rgba(15,23,42,.85);
+backdrop-filter:blur(20px);
+border:1px solid rgba(56,189,248,.15);
+padding:24px;
+border-radius:24px;
+box-shadow:
+0 20px 40px rgba(0,0,0,.4),
+0 0 40px rgba(14,165,233,.08);
+position:sticky;
+top:20px;
+height:fit-content;
+">
 
             <h2 style="margin-bottom:15px;font-size:18px;color:#38bdf8">
                 🚚 Ready To Distribute
             </h2>
-            <input id="readyOrderInput"
+            <input class="ready" id="readyOrderInput"
                 placeholder="Order #"
                 style="width:100%;padding:10px;margin-bottom:10px;
                 border-radius:10px;border:1px solid #1f2937;
@@ -320,22 +418,48 @@ function showReadyToDistributeTab() {
                 style="width:100%;padding:10px;margin-bottom:10px;
                 border-radius:10px;border:1px solid #1f2937;
                 background:#020617;color:white" />
+<select id="batchTypeSelect"
+    onchange="changeBatchType(this.value)"
+    style="
+        width:100%;
+        padding:10px;
+        margin-bottom:10px;
+        border-radius:10px;
+        background:#020617;
+        color:white;
+        border:1px solid #1f2937;
+    ">
 
+    ${Object.keys(appSettings.batchTypes).map(type => `
+        <option value="${type}"
+            ${appSettings.selectedBatchType === type ? "selected" : ""}>
+            ${type}
+        </option>
+    `).join("")}
+
+</select>
             <button onclick="moveToReadyFromInputs()"
-                style="
-                    width:100%;
-                    padding:12px;
-                    background:linear-gradient(135deg,#22c55e,#16a34a);
-                    border:none;
-                    border-radius:10px;
-                    font-weight:700;
-                    color:white;
-                    cursor:pointer;
-                    box-shadow:0 0 12px #22c55e55;
-                ">
-                ➕ Add to Ready List
-            </button>
-
+               style="
+width:100%;
+padding:14px;
+border:none;
+border-radius:14px;
+background:
+linear-gradient(
+135deg,
+#22c55e,
+#16a34a
+);
+color:white;
+font-size:15px;
+font-weight:700;
+cursor:pointer;
+box-shadow:
+0 15px 30px rgba(34,197,94,.25);
+transition:.3s;
+">
+🚚 Add To Ready
+</button>
             <button onclick="exportReadyToExcel()"
                 style="
                     width:100%;
@@ -382,8 +506,21 @@ style="
 
         <!-- RIGHT PANEL (TABLE) -->
         <div style="
-            background:#0f172a;
-            border:1px solid #1f2937;
+            background:
+linear-gradient(
+180deg,
+rgba(15,23,42,.9),
+rgba(2,6,23,.95)
+);
+
+backdrop-filter:blur(20px);
+
+border:1px solid rgba(255,255,255,.05);
+
+border-radius:24px;
+
+box-shadow:
+0 20px 40px rgba(0,0,0,.4);
             padding:18px;
             border-radius:16px;
             overflow:auto;
@@ -416,7 +553,8 @@ style="
 
     container.classList.remove("hidden");
 
-    renderReadyOrders();
+renderReadyOrders();
+renderBatchesTable(); // 🔥 مهم
 }
 function distributeSelectedOrders() {
 
@@ -452,10 +590,11 @@ function distributeSelectedOrders() {
                     distributedDate: todayDate,
 
                     batch: {
-                        name: currentBatch,
-                        date: todayDate,
-                        time: todayISO
-                    },
+    type: currentBatch.type,
+    name: currentBatch.name,
+    date: todayDate,
+    time: todayISO
+},
 
                     distributedTime: todayISO,
 
@@ -465,7 +604,8 @@ function distributeSelectedOrders() {
                             action: "distributed",
                             date: todayISO,
                             by: "Distribution",
-                            batch: currentBatch
+                            batch: currentBatch.name,
+batchType: currentBatch.type
                         }
                     ]
                 };
@@ -487,10 +627,11 @@ function distributeSelectedOrders() {
                     localOrder.distributedDate = todayDate;
 
                     localOrder.batch = {
-                        name: currentBatch,
-                        date: todayDate,
-                        time: todayISO
-                    };
+    type: currentBatch.type,
+    name: currentBatch.name,
+    date: todayDate,
+    time: todayISO
+};
 
                     localOrder.distributedTime = todayISO;
                 }
@@ -520,7 +661,14 @@ function distributeSelectedOrders() {
 
     });
 }
+function changeBatchType(type) {
 
+    appSettings.selectedBatchType = type;
+
+    saveSettings();
+
+    renderBatchesTable();
+}
 function initReadyToDistribute() {
 
     const input = document.getElementById("readyOrderInput");
@@ -593,7 +741,7 @@ function renderReadyOrders() {
     }
 
 container.innerHTML = `
-<table style="width:100%;border-collapse:collapse;text-align:center">
+<table class="ready-table" style="width:100%;border-collapse:collapse;text-align:center">
     <tr>
         <th></th> <!-- 🔥 جديد -->
         <th>Order</th>
@@ -698,10 +846,26 @@ function showSettingsTab() {
             </button>
 
         </div>
+<select id="settingsBatchType"
+    onchange="changeSettingsBatchType(this.value)"
+    style="
+        width:100%;
+        padding:12px;
+        margin-bottom:20px;
+        border-radius:10px;
+    ">
 
+    ${Object.keys(appSettings.batchTypes).map(type => `
+        <option value="${type}"
+            ${appSettings.selectedBatchType === type ? "selected" : ""}>
+            ${type}
+        </option>
+    `).join("")}
+
+</select>
         <div id="batchSettingsList">
 
-            ${appSettings.batches.map((b, index) => `
+            ${getCurrentBatchList().map((b, index) => `
 
                 <div style="
                     display:grid;
@@ -770,34 +934,41 @@ function showSettingsTab() {
 }
 function updateBatchName(index, value) {
 
-    appSettings.batches[index].name = value;
+    getCurrentBatchList()[index].name = value;
     saveSettings();
 }
 
 function updateBatchFrom(index, value) {
 
-    appSettings.batches[index].from = value;
+    getCurrentBatchList()[index].from = value;
     saveSettings();
 }
 
 function updateBatchTo(index, value) {
 
-    appSettings.batches[index].to = value;
+    getCurrentBatchList()[index].to = value;
     saveSettings();
 }
 
 function deleteBatch(index) {
 
-    appSettings.batches.splice(index, 1);
+    getCurrentBatchList().splice(index, 1);
 
     saveSettings();
 
     showSettingsTab();
 }
+function changeSettingsBatchType(type) {
 
+    appSettings.selectedBatchType = type;
+
+    saveSettings();
+
+    showSettingsTab();
+}
 function addBatch() {
 
-    appSettings.batches.push({
+    getCurrentBatchList().push({
         name: "New Batch",
         from: "00:00",
         to: "00:00"

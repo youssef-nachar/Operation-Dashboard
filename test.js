@@ -2470,3 +2470,16 @@ function loadReportWarehouses() {
         select.appendChild(option);
     });
 }
+document.querySelectorAll('.date-field input').forEach(input => {
+
+    input.parentElement.addEventListener('click', () => {
+
+        if (input.showPicker) {
+            input.showPicker();
+        } else {
+            input.focus();
+        }
+
+    });
+
+});

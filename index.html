@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="style.css">
 
 </head>
@@ -66,68 +66,123 @@
 </div>   
     <div id="dashboard" class="hidden app">
         <aside class="sidebar">
-            <h2></i>Operation dashboard system</h2>
 
-            <a id ="dsh" href="#" onclick="showDashboardHome()">
-                 Dashboard</a>
-             
-<div class="sidebar-dropdown">
+    <div class="sidebar-brand">
 
-    <a href="#"
-       onclick="toggleWarehouseMenu(event)"
-       class="dropdown-btn">
+        <div class="brand-logo">
+            <i class="fa-solid fa-cubes-stacked"></i>
+        </div>
 
-        <i class="fa-solid fa-warehouse"></i>
-        Warehouses
+        <div class="brand-info">
+            <h2>OMS</h2>
+            <span>Operations Management System</span>
+        </div>
 
-        <i class="fa-solid fa-chevron-down dropdown-arrow"></i>
-    </a>
-<div id="warehouseMenu" class="dropdown-menu hidden">
+    </div>
 
-    <a href="#" onclick="loginAsWarehouse('PHARMA')">
-        PHARMA
-    </a>
+    <div class="sidebar-section-title">
+        MAIN MENU
+    </div>
 
-    <a href="#" onclick="loginAsWarehouse('RETAIL')">
-        RETAIL
+    <a id="dsh" href="#" onclick="showDashboardHome()">
+        <i class="fa-solid fa-chart-line"></i>
+        Dashboard
     </a>
 
-    <a href="#" onclick="loginAsWarehouse('P&C')">
-        P&C
-    </a>
+    <div class="sidebar-dropdown">
 
-    <a href="#" onclick="loginAsWarehouse('LOREAL LUX')">
-        LOREAL LUX
-    </a>
+        <a href="#"
+           onclick="toggleWarehouseMenu(event)"
+           class="dropdown-btn">
 
-    <a href="#" onclick="loginAsWarehouse('BEESLINE')">
-        BEESLINE
-    </a>
+            <i class="fa-solid fa-warehouse"></i>
+            Warehouses
 
-    <a href="#" onclick="loginAsWarehouse('Packing Station')">
-        Packing Station
-    </a>
+            <i class="fa-solid fa-chevron-down dropdown-arrow"></i>
+        </a>
 
-</div>
+        <div id="warehouseMenu" class="dropdown-menu hidden">
 
-</div>
-                  <a href="#" onclick="showNewOrderTab()"> New Orders</a>
-                <a href"#" id="reade" onclick="showReadyToDistributeTab()">Ready To Distribute</a> 
-<a href="#" onclick="showReturnTab()">
-    Returns
-</a>
-            <a href="#" id="teamNotesBtn" style="display:none;" onclick="openTeamNotesTab()">
-                Team Notes
+            <a href="#" onclick="loginAsWarehouse('PHARMA')">
+                PHARMA
             </a>
-            <a href="#" onclick="showReportsTab()">
-    Reports
-</a>
-<a href="#" onclick="showAboutTab()">
-    <i class="fa-solid fa-circle-info"></i>
-    About System
-</a>
-                <a href="#" onclick="signOut()" style="color:#ef4444">Logout</a>
-        </aside>
+
+            <a href="#" onclick="loginAsWarehouse('RETAIL')">
+                RETAIL
+            </a>
+
+            <a href="#" onclick="loginAsWarehouse('P&C')">
+                P&C
+            </a>
+
+            <a href="#" onclick="loginAsWarehouse('LOREAL LUX')">
+                LOREAL LUX
+            </a>
+
+            <a href="#" onclick="loginAsWarehouse('BEESLINE')">
+                BEESLINE
+            </a>
+
+            <a href="#" onclick="loginAsWarehouse('Packing Station')">
+                Packing Station
+            </a>
+
+        </div>
+  <a href="#" onclick="showNewOrderTab()">
+        <i class="fa-solid fa-cart-plus"></i>
+         Orders Overview
+    </a>
+    </div>
+
+    <div class="sidebar-section-title">
+        OPERATIONS
+    </div>
+
+  
+
+    <a href="#" id="reade" onclick="showReadyToDistributeTab()">
+        <i class="fa-solid fa-truck-ramp-box"></i>
+        Ready To Distribute
+    </a>
+
+    <a href="#" onclick="showReturnTab()">
+        <i class="fa-solid fa-rotate-left"></i>
+        Returns
+    </a>
+
+    <a href="#" id="teamNotesBtn" style="display:none;" onclick="openTeamNotesTab()">
+        <i class="fa-solid fa-users"></i>
+        Team Notes
+    </a>
+
+    <a href="#" onclick="showReportsTab()">
+        <i class="fa-solid fa-chart-pie"></i>
+        Reports & Analytics
+    </a>
+
+    <a href="#" onclick="showAboutTab()">
+        <i class="fa-solid fa-circle-info"></i>
+        About OMS
+    </a>
+
+    <div class="sidebar-footer">
+
+        <div class="system-status">
+            <span class="status-dot"></span>
+            System Online
+        </div>
+
+        <a href="#"
+           onclick="signOut()"
+           class="logout-link"
+           style="color:#ef4444">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            Logout
+        </a>
+
+    </div>
+
+</aside>
 
         <main class="main">
             <header id="dashboardHeader"  style="margin-bottom:20px;display:flex;justify-content:space-between;align-items:center">
@@ -221,107 +276,229 @@ background:#22c55e;
 </div>
 <div id="reportsTab" class="hidden">
 
-    <!-- BUTTON -->
-    <button id="toggleAdvancedReportsBtn"
-        onclick="toggleAdvancedReports()"
-        style="
-            padding:12px 18px;
-            background:#0f172a;
-            color:white;
-            border:none;
-            border-radius:10px;
-            cursor:pointer;
-            font-weight:600;
-            margin-bottom:15px;
-    ">
-        📊 Analytics
-    </button>
+    <!-- HEADER -->
+    <div class="reports-header">
 
-    <!-- ADVANCED REPORT BOX -->
-    <div id="advancedReportBox"
-        class="hidden"
-        style="
-            background:#0f172a;
-            padding:20px;
-            border-radius:14px;
-            margin-top:20px;
-    ">
+        <div>
+            <h1>Reports & Analytics</h1>
+            <p>
+                Generate operational reports and export warehouse data.
+            </p>
+        </div>
 
-     <h2 style="
-    margin-bottom:20px;
-    color:#22c55e;
-">
-    Operations Analytics
-</h2>
-        <div style="
-            display:flex;
-            gap:10px;
-            flex-wrap:wrap;
-            align-items:center;
-        ">
+        <div class="reports-header-actions">
 
-            <input
-                type="date"
-                id="advancedFromDate"
-                style="
-                    padding:10px;
-                    border:none;
-                    border-radius:8px;
-                    background:#1e293b;
-                    color:white;
-            ">
+            <button class="report-action-btn">
+                <i class="fa-solid fa-chart-line"></i>
+                Analytics
+            </button>
 
-            <input
-                type="date"
-                id="advancedToDate"
-                style="
-                    padding:10px;
-                    border:none;
-                    border-radius:8px;
-                    background:#1e293b;
-                    color:white;
-            ">
-
-            <button
-                onclick="exportAdvancedExcel()"
-                style="
-                    padding:10px 20px;
-                    border:none;
-                    border-radius:8px;
-                    background:#22c55e;
-                    color:white;
-                    font-weight:700;
-                    cursor:pointer;
-            ">
-                Export Excel Report
+            <button class="report-action-btn">
+                <i class="fa-solid fa-file-export"></i>
+                Export Center
             </button>
 
         </div>
 
-        <div id="reportStats"
-            style="
-                margin-top:20px;
-                display:grid;
-                grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-                gap:15px;
-        "></div>
+    </div>
+
+    <!-- STATS -->
+    <div class="report-stats">
+
+        <div class="report-stat-card">
+            <i class="fa-solid fa-file-lines"></i>
+            <h2>6</h2>
+            <span>Available Reports</span>
+        </div>
+
+        <div class="report-stat-card">
+            <i class="fa-solid fa-warehouse"></i>
+            <h2>6</h2>
+            <span>Warehouses</span>
+        </div>
+
+        <div class="report-stat-card">
+            <i class="fa-solid fa-file-arrow-down"></i>
+            <h2>Excel / PDF</h2>
+            <span>Export Formats</span>
+        </div>
 
     </div>
-    <h2 style="margin-bottom:20px">Reports</h2>
 
-    <div style="display:flex;gap:10px;flex-wrap:wrap">
+    <!-- REPORT CARDS -->
+    <div class="reports-grid">
 
-        <button onclick="exportDailyReport()">
-            Daily Report
-        </button>
+        <div class="report-card"
+             onclick="openReportConfig('daily')">
 
-        <button onclick="exportWeeklyReport()">
-            Weekly Report
-        </button>
+            <div class="report-icon">
+                <i class="fa-solid fa-calendar-day"></i>
+            </div>
 
-        <button onclick="exportMonthlyReport()">
-            Monthly Report
-        </button>
+            <div class="report-content">
+                <h3>Daily Report</h3>
+                <p>Daily warehouse operations summary.</p>
+            </div>
+
+            <i class="fa-solid fa-arrow-right"></i>
+
+        </div>
+
+        <div class="report-card"
+             onclick="openReportConfig('warehouse')">
+
+            <div class="report-icon">
+                <i class="fa-solid fa-warehouse"></i>
+            </div>
+
+            <div class="report-content">
+                <h3>Warehouse Report</h3>
+                <p>Performance by warehouse.</p>
+            </div>
+
+            <i class="fa-solid fa-arrow-right"></i>
+
+        </div>
+
+        <div class="report-card"
+             onclick="openReportConfig('pending')">
+
+            <div class="report-icon">
+                <i class="fa-solid fa-clock"></i>
+            </div>
+
+            <div class="report-content">
+                <h3>Pending Orders</h3>
+                <p>Orders waiting for processing.</p>
+            </div>
+
+            <i class="fa-solid fa-arrow-right"></i>
+
+        </div>
+
+        <div class="report-card"
+             onclick="openReportConfig('distributed')">
+
+            <div class="report-icon">
+                <i class="fa-solid fa-truck"></i>
+            </div>
+
+            <div class="report-content">
+                <h3>Distributed Orders</h3>
+                <p>Completed deliveries report.</p>
+            </div>
+
+            <i class="fa-solid fa-arrow-right"></i>
+
+        </div>
+
+        <div class="report-card"
+             onclick="openReportConfig('returned')">
+
+            <div class="report-icon">
+                <i class="fa-solid fa-rotate-left"></i>
+            </div>
+
+            <div class="report-content">
+                <h3>Returned Orders</h3>
+                <p>Returned shipment analytics.</p>
+            </div>
+
+            <i class="fa-solid fa-arrow-right"></i>
+
+        </div>
+
+        <div class="report-card"
+             onclick="openReportConfig('canceled')">
+
+            <div class="report-icon">
+                <i class="fa-solid fa-ban"></i>
+            </div>
+
+            <div class="report-content">
+                <h3>Canceled Orders</h3>
+                <p>Cancellation tracking report.</p>
+            </div>
+
+            <i class="fa-solid fa-arrow-right"></i>
+
+        </div>
+
+    </div>
+
+</div>
+<div id="reportConfigPage" class="report-config hidden">
+
+    <!-- HEADER -->
+    <div class="report-config-header">
+
+        <div>
+            <h2>Report Configuration</h2>
+            <p>Customize and generate your warehouse report</p>
+        </div>
+
+        <div class="report-badge">
+            <i class="fa-solid fa-sliders"></i>
+            CONFIG PANEL
+        </div>
+
+    </div>
+
+    <!-- CARD -->
+    <div class="report-config-card">
+
+        <div class="form-grid">
+
+            <!-- Warehouse -->
+            <div class="form-group">
+                <label>
+                    <i class="fa-solid fa-warehouse"></i>
+                    Warehouse
+                </label>
+                <select id="reportWarehouse">
+                    <option value="">All Warehouses</option>
+                </select>
+            </div>
+
+            <!-- From -->
+            <div class="form-group">
+                <label>
+                    <i class="fa-solid fa-calendar"></i>
+                    From Date
+                </label>
+                <input type="date" id="reportFrom">
+            </div>
+
+            <!-- To -->
+            <div class="form-group">
+                <label>
+                    <i class="fa-solid fa-calendar-check"></i>
+                    To Date
+                </label>
+                <input type="date" id="reportTo">
+            </div>
+
+            <!-- Export -->
+            <div class="form-group">
+                <label>
+                    <i class="fa-solid fa-file-export"></i>
+                    Export Type
+                </label>
+                <select id="reportExportType">
+                    <option value="excel">Excel (.xlsx)</option>
+                    <option value="pdf">PDF Document</option>
+                </select>
+            </div>
+
+        </div>
+
+        <!-- ACTION BUTTON -->
+        <div class="report-actions">
+            <button class="generate-btn" onclick="generateSelectedReport()">
+                <i class="fa-solid fa-bolt"></i>
+                Generate Report
+            </button>
+        </div>
 
     </div>
 

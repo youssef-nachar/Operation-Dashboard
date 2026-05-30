@@ -185,71 +185,57 @@
 </aside>
 
         <main class="main">
-            <header id="dashboardHeader"  style="margin-bottom:20px;display:flex;justify-content:space-between;align-items:center">
-                <h3><B style="font-style: 26px;">My</B>Holdal</h3>
-                <div id="dates" style="display:flex;gap:10px;align-items:center">
-                    <button type="button"  id="toggleFrDate" style="padding:4px 8px; font-size:12px;"> from</button>
+           <header id="dashboardHeader" class="topbar">
 
-                    <input type="date" id="dateFrom" onchange="updateDashboard()">
+    <div class="topbar-left">
 
-                    <button type="button" id="toggleToDate" style="padding:4px 8px; font-size:12px;"> to</button>
+        <div class="company">
+            <span class="company-mark">M</span>
 
-                    <input type="date" id="dateTo" onchange="updateDashboard()">
+            <div>
+                <h3>MyHoldal</h3>
+                <small>Warehouse's Operations</small>
+            </div>
+        </div>
 
-                    <div class="quick-menu">
-            <button onclick="QuickMenu(event)" style="padding:4px 8px;">
-        ⋯
-    </button>
+    </div>
 
+    <div class="topbar-center">
 
-                        <div id="quickMenu" onclick="click()" class="quick-dropdown hidden">
-                            <div onclick="QuickDate('today')">
-                                <i class="fa-regular fa-calendar-day"></i> Today
-                            </div>
-                            <div onclick="QuickDate('yesterday')">
-                                <i class="fa-regular fa-calendar-minus"></i> Yesterday
-                            </div>
-                            <div onclick="QuickDate('week')">
-                                <i class="fa-regular fa-calendar-week"></i> This Week
-                            </div>
-                            <div onclick="QuickDate('month')">
-                                <i class="fa-regular fa-calendar"></i> This Month
-                            </div>
-                            <button id="resetFiltersBtn" onclick="FiltersReset()" style="  
-                             padding:6px 10px;  
-                             border-radius:10px;  
-                             background:#7f1d1d;  
-                             font-size:12px;  
-                             ">
+       <div class="date-field">
+    <span class="date-label">FROM</span>
+    <input type="date" id="dateFrom" onchange="updateDashboard()">
+</div>
 
-                                Reset
+<div class="date-field">
+    <span class="date-label">TO</span>
+    <input type="date" id="dateTo" onchange="updateDashboard()">
+</div>
 
-                            </button>
-                            <button onclick="clearAllOrders()">Delete All Orders</button>
+    </div>
 
-                        </div>
-                    </div>
-                </div>
-                <div id="liveStatus" style="  
-padding:6px 10px;  
-border-radius:10px;  
-background:#020617;  
-font-size:12px;  
-display:flex;  
-gap:6px;  
-align-items:center;
+    <div class="topbar-right">
 
-">
-                    <span id="liveDot" style="  
-width:8px;  
-height:8px;  
-border-radius:50%;  
-background:#22c55e;  
-"></span>
-                    <span id="liveText">LIVE</span>
+        <button onclick="QuickDate('today')">Today</button>
 
-                </div>
-            </header>
+        <button onclick="QuickDate('yesterday')">Yesterday</button>
+
+        <button onclick="QuickDate('week')">Week</button>
+
+        <button onclick="QuickDate('month')">Month</button>
+
+        <button onclick="FiltersReset()" class="reset-btn">
+            Reset
+        </button>
+
+        <div class="live-badge">
+            <span></span>
+            LIVE
+        </div>
+
+    </div>
+
+</header>
 <div id="returnTab" class="hidden">
 
     <div style="padding:20px">

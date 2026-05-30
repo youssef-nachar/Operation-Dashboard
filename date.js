@@ -152,9 +152,7 @@ window.toggleQuickMenu = function (event) {
     }
 
     // إغلاق القائمة عند الضغط خارجها  
-    document.addEventListener("click", () => {
-        document.getElementById("quickMenu").classList.add("hidden");
-    });
+    
 
 // اختيار تاريخ سريع
 window.setQuickDate = function (type) {

@@ -2483,3 +2483,57 @@ document.querySelectorAll('.date-field input').forEach(input => {
     });
 
 });
+
+function renderDistributedCompaniesReport(orders) {
+renderDistributedCompaniesReport(orders);
+    const companies = {};
+
+    orders.forEach(order => {
+
+        const dist = distributedOrdersMap[order.orderNo];
+
+        if (!dist) return;
+
+        const company = dist.company || "Unknown";
+
+        if (!companies[company]) {
+            companies[company] = 0;
+        }
+
+        companies[company]++;
+
+    });
+
+    let html = `
+        <table class="analytics-table">
+            <tr>
+                <th>Company</th>
+                <th>Distributed Orders</th>
+            </tr>
+    `;
+
+    Object.entries(companies)
+        .sort((a,b) => b[1] - a[1])
+        .forEach(([company,count]) => {
+
+            html += `
+                <tr>
+                    <td>${company}</td>
+                    <td>${count}</td>
+                </tr>
+            `;
+
+        });
+
+    html += `
+            <tr style="font-weight:bold;background:#0f172a">
+                <td>TOTAL</td>
+                <td>${Object.values(companies).reduce((a,b)=>a+b,0)}</td>
+            </tr>
+        </table>
+    `;
+
+    document.getElementById(
+        "distributedCompaniesReport"
+    ).innerHTML = html;
+}
